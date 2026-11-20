@@ -4,6 +4,7 @@ let mde;
 let products = [];
 let currentProduct = "";
 let currentStem = "";
+let editKind = "chapter";
 let dirty = false;
 
 const snippets = {
@@ -18,7 +19,7 @@ function toast(msg, isError) {
   el.hidden = false;
   el.textContent = msg;
   el.style.background = isError ? "#cf222e" : "#24292f";
-  setTimeout(() => { el.hidden = true; }, 5000);
+  setTimeout(() => { el.hidden = true; }, 6000);
 }
 
 async function api(url, opts = {}) {
@@ -37,6 +38,40 @@ function setDirty(v) {
   dirty = v;
 }
 
+async function ensureSavedBeforeSwitch() {
+  if (!dirty) return true;
+  return confirm("当前内容未保存，确定放弃修改并切换？");
+}
+
+function updatePanels() {
+  const isHome = editKind === "home";
+  const isProduct = editKind === "product";
+  const isChapter = editKind === "chapter";
+  document.getElementById("productPanel").hidden = isHome;
+  document.getElementById("productMeta").hidden = !isProduct;
+  document.getElementById("chapterPanel").hidden = !isChapter;
+  document.getElementById("chapterToolbar").hidden = !isChapter;
+  document.getElementById("btnUploadImg").hidden = !isChapter;
+}
+
+async function loadHome() {
+  const data = await api("/api/home");
+  mde.value(data.content);
+  setDirty(false);
+  updatePreview();
+}
+
+async function loadProductOutline() {
+  if (!currentProduct) return;
+  const data = await api(`/api/product?id=${encodeURIComponent(currentProduct)}`);
+  document.getElementById("fieldTitle").value = data.title || "";
+  document.getElementById("fieldStatus").value = data.status || "";
+  document.getElementById("fieldSummary").value = data.summary || "";
+  mde.value(data.outline || "");
+  setDirty(false);
+  updatePreview();
+}
+
 async function loadProducts() {
   const data = await api("/api/products");
   products = data.products;
@@ -49,12 +84,11 @@ async function loadProducts() {
     sel.appendChild(o);
   });
   if (products.length) {
-    currentProduct = products[0].id;
+    if (!currentProduct || !products.find((x) => x.id === currentProduct)) {
+      currentProduct = products[0].id;
+    }
     sel.value = currentProduct;
     renderChapters();
-    if (products[0].chapters.length) {
-      await openChapter(products[0].chapters[0].stem);
-    }
   }
   await refreshGitStatus();
 }
@@ -67,33 +101,67 @@ function renderChapters() {
     const li = document.createElement("li");
     li.textContent = `${ch.stem} — ${ch.title}`;
     li.dataset.stem = ch.stem;
-    if (ch.stem === currentStem) li.classList.add("active");
-    li.onclick = () => openChapter(ch.stem);
+    if (ch.stem === currentStem && editKind === "chapter") li.classList.add("active");
+    li.onclick = () => {
+      editKind = "chapter";
+      document.getElementById("editKind").value = "chapter";
+      openChapter(ch.stem);
+    };
     ul.appendChild(li);
   });
 }
 
 async function openChapter(stem) {
-  if (dirty && !confirm("当前章节有未保存修改，继续切换？")) return;
-  const data = await api(`/api/chapter?product=${encodeURIComponent(currentProduct)}&stem=${encodeURIComponent(stem)}`);
+  if (!(await ensureSavedBeforeSwitch())) return;
+  if (!currentProduct) {
+    toast("请先选择或新建产品", true);
+    return;
+  }
+  const data = await api(
+    `/api/chapter?product=${encodeURIComponent(currentProduct)}&stem=${encodeURIComponent(stem)}`
+  );
   currentStem = stem;
+  editKind = "chapter";
+  document.getElementById("editKind").value = "chapter";
+  updatePanels();
   mde.value(data.content);
   setDirty(false);
   renderChapters();
   updatePreview();
 }
 
-async function writeChapter() {
-  if (!currentStem) throw new Error("请先选择章节");
-  await api("/api/chapter", {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      product: currentProduct,
-      stem: currentStem,
-      content: mde.value(),
-    }),
-  });
+async function writeCurrentDoc() {
+  if (editKind === "home") {
+    await api("/api/home", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content: mde.value() }),
+    });
+  } else if (editKind === "product") {
+    if (!currentProduct) throw new Error("请选择产品");
+    await api("/api/product", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        id: currentProduct,
+        title: document.getElementById("fieldTitle").value,
+        status: document.getElementById("fieldStatus").value,
+        summary: document.getElementById("fieldSummary").value,
+        outline: mde.value(),
+      }),
+    });
+  } else if (editKind === "chapter") {
+    if (!currentStem) throw new Error("请选择章节");
+    await api("/api/chapter", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        product: currentProduct,
+        stem: currentStem,
+        content: mde.value(),
+      }),
+    });
+  }
   setDirty(false);
 }
 
@@ -106,19 +174,79 @@ async function refreshGitStatus() {
   }
 }
 
-document.getElementById("productSelect").onchange = async (e) => {
-  currentProduct = e.target.value;
-  renderChapters();
-  const p = products.find((x) => x.id === currentProduct);
-  if (p?.chapters?.length) await openChapter(p.chapters[0].stem);
-  else {
+document.getElementById("editKind").onchange = async (e) => {
+  if (!(await ensureSavedBeforeSwitch())) {
+    e.target.value = editKind;
+    return;
+  }
+  editKind = e.target.value;
+  updatePanels();
+  if (editKind === "home") await loadHome();
+  else if (editKind === "product") await loadProductOutline();
+  else if (products.find((x) => x.id === currentProduct)?.chapters?.length) {
+    await openChapter(products.find((x) => x.id === currentProduct).chapters[0].stem);
+  } else {
     currentStem = "";
     mde.value("");
     updatePreview();
   }
 };
 
+document.getElementById("productSelect").onchange = async (e) => {
+  if (!(await ensureSavedBeforeSwitch())) {
+    e.target.value = currentProduct;
+    return;
+  }
+  currentProduct = e.target.value;
+  renderChapters();
+  if (editKind === "product") await loadProductOutline();
+  else if (editKind === "chapter") {
+    const p = products.find((x) => x.id === currentProduct);
+    if (p?.chapters?.length) await openChapter(p.chapters[0].stem);
+    else {
+      currentStem = "";
+      mde.value("");
+      updatePreview();
+    }
+  }
+};
+
+document.getElementById("btnNewProduct").onclick = async () => {
+  const id = prompt("新产品 ID（如 CX_ESP32_S31_Module_Xiaozhi_Board）：");
+  if (!id) return;
+  const title = prompt("产品显示名称：");
+  if (!title) return;
+  const summary = prompt("产品简介（可留空）：", `${title} 教程`);
+  const addChapter = confirm("是否同时创建第一章 01-overview？");
+  const body = { id, title, summary: summary || "" };
+  if (addChapter) {
+    body.chapter = "01-overview";
+    body.chapter_title = "概述";
+  }
+  try {
+    await api("/api/product", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    currentProduct = id;
+    await loadProducts();
+    document.getElementById("productSelect").value = id;
+    toast("产品已创建，已加入站点总纲列表。请保存并发布。");
+    editKind = "product";
+    document.getElementById("editKind").value = "product";
+    updatePanels();
+    await loadProductOutline();
+  } catch (err) {
+    toast(err.message, true);
+  }
+};
+
 document.getElementById("btnNewChapter").onclick = async () => {
+  if (!currentProduct) {
+    toast("请先选择产品", true);
+    return;
+  }
   const stem = prompt("新章节文件名（如 03-wifi）：");
   if (!stem) return;
   const title = prompt("章节标题：", "新章节");
@@ -130,13 +258,19 @@ document.getElementById("btnNewChapter").onclick = async () => {
       body: JSON.stringify({ product: currentProduct, stem, title }),
     });
     await loadProducts();
-    currentProduct = document.getElementById("productSelect").value;
+    editKind = "chapter";
+    document.getElementById("editKind").value = "chapter";
+    updatePanels();
     await openChapter(stem.replace(/\.md$/, ""));
     toast("章节已创建");
   } catch (err) {
     toast(err.message, true);
   }
 };
+
+["fieldTitle", "fieldStatus", "fieldSummary"].forEach((id) => {
+  document.getElementById(id).addEventListener("input", () => setDirty(true));
+});
 
 document.querySelectorAll("[data-snippet]").forEach((btn) => {
   btn.onclick = () => {
@@ -151,7 +285,7 @@ document.getElementById("btnUploadImg").onclick = () => document.getElementById(
 
 document.getElementById("fileImg").onchange = async (e) => {
   const file = e.target.files?.[0];
-  if (!file) return;
+  if (!file || editKind !== "chapter") return;
   const fd = new FormData();
   fd.append("product", currentProduct);
   fd.append("file", file);
@@ -170,12 +304,18 @@ document.getElementById("fileImg").onchange = async (e) => {
 };
 
 document.getElementById("btnDeleteChapter").onclick = async () => {
-  if (!currentStem) return;
-  if (!confirm(`确定删除章节 ${currentStem}？此操作在「保存」后才会提交到 Git。`)) return;
+  if (editKind !== "chapter" || !currentStem) return;
+  if (!confirm(`确定删除章节 ${currentStem}？`)) return;
   try {
-    await api(`/api/chapter?product=${encodeURIComponent(currentProduct)}&stem=${encodeURIComponent(currentStem)}`, { method: "DELETE" });
+    await api(
+      `/api/chapter?product=${encodeURIComponent(currentProduct)}&stem=${encodeURIComponent(currentStem)}`,
+      { method: "DELETE" }
+    );
+    currentStem = "";
     await loadProducts();
     toast("章节已删除");
+    mde.value("");
+    updatePreview();
   } catch (err) {
     toast(err.message, true);
   }
@@ -183,7 +323,7 @@ document.getElementById("btnDeleteChapter").onclick = async () => {
 
 document.getElementById("btnSave").onclick = async () => {
   try {
-    if (currentStem) await writeChapter();
+    await writeCurrentDoc();
     const msg = document.getElementById("commitMsg").value.trim();
     const j = await api("/api/save", {
       method: "POST",
@@ -199,16 +339,15 @@ document.getElementById("btnSave").onclick = async () => {
 };
 
 document.getElementById("btnPublish").onclick = async () => {
-  if (!confirm("将推送到 GitHub，网站约在 1～2 分钟内更新。继续？")) return;
+  if (!confirm("推送到 GitHub，网站约 1～2 分钟更新。继续？")) return;
   try {
-    if (currentStem && dirty) await writeChapter();
-    if (dirty) {
-      await api("/api/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: document.getElementById("commitMsg").value || undefined }),
-      });
-    }
+    if (dirty) await writeCurrentDoc();
+    const msg = document.getElementById("commitMsg").value.trim();
+    await api("/api/save", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: msg || undefined }),
+    });
     const j = await api("/api/publish", { method: "POST" });
     toast(j.message);
     await refreshGitStatus();
@@ -229,5 +368,10 @@ window.addEventListener("DOMContentLoaded", () => {
     setDirty(true);
     updatePreview();
   });
-  loadProducts().catch((e) => toast(e.message, true));
+  updatePanels();
+  loadProducts()
+    .then(() => {
+      if (products[0]?.chapters?.length) return openChapter(products[0].chapters[0].stem);
+    })
+    .catch((e) => toast(e.message, true));
 });

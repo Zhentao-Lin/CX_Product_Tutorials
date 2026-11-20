@@ -27,6 +27,7 @@ except ImportError:
 
 ROOT = Path(__file__).resolve().parents[1]
 CATALOG = ROOT / "catalog" / "products.yml"
+HOME_MD = ROOT / "catalog" / "home.md"
 SOURCE = ROOT / "docs" / "source"
 PRODUCTS = SOURCE / "products"
 TEMPLATES = ROOT / "templates"
@@ -105,22 +106,27 @@ def list_chapters(product_id: str) -> list[tuple[str, str]]:
         return []
     items: list[tuple[str, str]] = []
     for md in sorted(d.glob("*.md")):
+        if md.name in ("outline.md",):
+            continue
         stem = md.stem
         items.append((stem, chapter_title_from_md(md)))
     return items
 
 
 def write_root_index(products: list[dict]) -> None:
+    if not HOME_MD.is_file():
+        HOME_MD.parent.mkdir(parents=True, exist_ok=True)
+        HOME_MD.write_text(
+            "本站为 **总产品大纲**。\n\n请在左侧目录选择产品。\n",
+            encoding="utf-8",
+        )
     lines = [
         GENERATED_BANNER_RST.rstrip(),
         "CX 硬件产品教程",
         "=" * 12,
         "",
-        "本站为 **总产品大纲**。左侧栏可展开各产品；正文区为产品简介与入口。",
-        "",
-        "产品 ID 命名：`CX_<主控>_<Module|Chip>_<定位>`。",
-        "",
-        "新增章节：在产品目录下添加 ``NN-名称.md``（首行 ``# 标题``），运行 ``python tools/cx_docs.py sync`` 或 ``build``；推送 GitHub 后网站自动更新。",
+        ".. include:: ../../catalog/home.md",
+        "   :parser: myst_parser.parsers.sphinx_.SphinxParser",
         "",
         ".. toctree::",
         "   :maxdepth: 2",
@@ -155,6 +161,15 @@ def write_product_index(product: dict, chapters: list[tuple[str, str]]) -> None:
     if summary:
         lines.extend(summary.splitlines())
         lines.append("")
+    outline_md = PRODUCTS / pid / "outline.md"
+    if outline_md.is_file():
+        lines.extend(
+            [
+                ".. include:: outline.md",
+                "   :parser: myst_parser.parsers.sphinx_.SphinxParser",
+                "",
+            ]
+        )
     lines.extend(
         [
             "本页为 **产品教程大纲**；章节见下方目录与左侧导航。",

@@ -2,11 +2,8 @@
 CX 硬件产品教程
 ============
 
-本站为 **总产品大纲**。左侧栏可展开各产品；正文区为产品简介与入口。
-
-产品 ID 命名：`CX_<主控>_<Module|Chip>_<定位>`。
-
-新增章节：在产品目录下添加 ``NN-名称.md``（首行 ``# 标题``），运行 ``python tools/cx_docs.py sync`` 或 ``build``；推送 GitHub 后网站自动更新。
+.. include:: ../../catalog/home.md
+   :parser: myst_parser.parsers.sphinx_.SphinxParser
 
 .. toctree::
    :maxdepth: 2

@@ -20,19 +20,45 @@
 
   <div class="layout">
     <aside class="sidebar">
-      <label>产品</label>
-      <select id="productSelect"></select>
-      <div class="chapter-head">
-        <label>章节</label>
-        <button type="button" id="btnNewChapter" title="新建章节">＋</button>
+      <label>编辑内容</label>
+      <select id="editKind">
+        <option value="home">站点总纲（首页说明）</option>
+        <option value="product">产品教程大纲</option>
+        <option value="chapter" selected>章节正文</option>
+      </select>
+
+      <div id="productPanel">
+        <div class="row-btns">
+          <label>产品</label>
+          <button type="button" id="btnNewProduct" title="新建产品">＋产品</button>
+        </div>
+        <select id="productSelect"></select>
       </div>
-      <ul id="chapterList"></ul>
-      <p class="hint">保存 = 本地 Git 提交；发布 = push，触发网站自动更新。</p>
+
+      <div id="productMeta" class="meta-form" hidden>
+        <label>产品标题（显示名）</label>
+        <input id="fieldTitle" type="text" />
+        <label>状态</label>
+        <input id="fieldStatus" type="text" placeholder="连载中 / 策划中" />
+        <label>简介（会出现在网站产品页）</label>
+        <textarea id="fieldSummary" rows="3"></textarea>
+        <p class="hint">下方大编辑器可写「outline 补充说明」（对应 outline.md）</p>
+      </div>
+
+      <div id="chapterPanel">
+        <div class="chapter-head">
+          <label>章节</label>
+          <button type="button" id="btnNewChapter" title="新建章节">＋章</button>
+        </div>
+        <ul id="chapterList"></ul>
+      </div>
+
+      <p class="hint">保存 = 本地 Git；发布 = 推送到 GitHub，自动更新网站。新建产品会自动进总纲产品列表。</p>
       <pre id="gitStatus" class="git-status"></pre>
     </aside>
 
     <main class="editor-pane">
-      <div class="toolbar">
+      <div class="toolbar" id="chapterToolbar">
         <button type="button" data-snippet="table">插入表格</button>
         <button type="button" data-snippet="code">插入代码块</button>
         <button type="button" id="btnUploadImg">上传图片</button>

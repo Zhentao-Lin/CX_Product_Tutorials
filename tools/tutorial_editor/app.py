@@ -23,6 +23,7 @@ PRODUCTS = cx_docs.PRODUCTS
 CATALOG = cx_docs.CATALOG
 SOURCE = cx_docs.SOURCE
 NAV_FOOTER = cx_docs.NAV_FOOTER
+HOME_MD = cx_docs.HOME_MD
 
 app = Flask(
     __name__,
@@ -82,6 +83,101 @@ def api_products():
             }
         )
     return jsonify(products=out)
+
+
+@app.get("/api/home")
+def api_get_home():
+    if not HOME_MD.is_file():
+        HOME_MD.parent.mkdir(parents=True, exist_ok=True)
+        HOME_MD.write_text("# 总产品大纲说明\n\n", encoding="utf-8")
+    return jsonify(content=HOME_MD.read_text(encoding="utf-8"))
+
+
+@app.put("/api/home")
+def api_put_home():
+    data = request.get_json(force=True) or {}
+    content = data.get("content", "")
+    HOME_MD.parent.mkdir(parents=True, exist_ok=True)
+    HOME_MD.write_text(content, encoding="utf-8")
+    cx_docs.cmd_sync(type("NS", (), {})())
+    return jsonify(ok=True)
+
+
+@app.get("/api/product")
+def api_get_product():
+    pid = request.args.get("id", "")
+    if not safe_product_id(pid):
+        return jsonify(error="非法产品 ID"), 400
+    products = cx_docs.load_catalog()
+    product = next((p for p in products if p["id"] == pid), None)
+    if not product:
+        return jsonify(error="产品不存在"), 404
+    outline = PRODUCTS / pid / "outline.md"
+    outline_text = outline.read_text(encoding="utf-8") if outline.is_file() else ""
+    return jsonify(
+        id=pid,
+        title=product.get("title", ""),
+        status=product.get("status", ""),
+        summary=product.get("summary", ""),
+        outline=outline_text,
+    )
+
+
+@app.put("/api/product")
+def api_put_product():
+    data = request.get_json(force=True) or {}
+    pid = data.get("id", "")
+    if not safe_product_id(pid):
+        return jsonify(error="非法产品 ID"), 400
+    products = cx_docs.load_catalog()
+    product = next((p for p in products if p["id"] == pid), None)
+    if not product:
+        return jsonify(error="产品不存在"), 404
+    product["title"] = data.get("title") or product["title"]
+    product["status"] = data.get("status", product.get("status", ""))
+    product["summary"] = data.get("summary", product.get("summary", ""))
+    cx_docs.save_catalog(products)
+    outline = (data.get("outline") or "").strip()
+    outline_path = PRODUCTS / pid / "outline.md"
+    if outline:
+        outline_path.write_text(outline + "\n", encoding="utf-8")
+    elif outline_path.is_file():
+        outline_path.unlink()
+    cx_docs.cmd_sync(type("NS", (), {})())
+    return jsonify(ok=True)
+
+
+@app.post("/api/product")
+def api_new_product():
+    data = request.get_json(force=True) or {}
+    pid = (data.get("id") or "").strip()
+    title = (data.get("title") or "").strip()
+    if not safe_product_id(pid) or not title:
+        return jsonify(error="需要合法产品 ID（CX_...）和中文标题"), 400
+    products = cx_docs.load_catalog()
+    if any(p["id"] == pid for p in products):
+        return jsonify(error="产品 ID 已存在"), 409
+    products.append(
+        {
+            "id": pid,
+            "title": title,
+            "status": data.get("status") or "策划中",
+            "summary": data.get("summary") or f"{title} 教程\n",
+        }
+    )
+    cx_docs.save_catalog(products)
+    (PRODUCTS / pid).mkdir(parents=True, exist_ok=True)
+    cx_docs.ensure_product_asset_dirs(pid)
+    if data.get("chapter"):
+        stem = data["chapter"].removesuffix(".md")
+        if safe_chapter_stem(stem):
+            chap_title = data.get("chapter_title") or "概述"
+            (PRODUCTS / pid / f"{stem}.md").write_text(
+                f"# {chap_title}\n\n## 本章目标\n\n（待编写。）\n\n{NAV_FOOTER}\n",
+                encoding="utf-8",
+            )
+    cx_docs.cmd_sync(type("NS", (), {})())
+    return jsonify(ok=True, id=pid)
 
 
 @app.get("/api/chapter")
@@ -172,7 +268,7 @@ def api_sync():
 
 @app.post("/api/save")
 def api_save():
-    """写入已在 PUT 完成；此处 sync + git add + commit"""
+    """客户端应先 PUT 当前文档；此处 sync + git add + commit"""
     data = request.get_json(force=True) or {}
     msg = data.get("message") or f"编辑器保存 {datetime.now():%Y-%m-%d %H:%M:%S}"
     cx_docs.cmd_sync(type("NS", (), {})())
