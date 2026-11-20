@@ -1,0 +1,9 @@
+docs/_build/
+__pycache__/
+.venv/
+venv/
+*.pyc
+.DS_Store
+Thumbs.db
+_site/
+.bundle/

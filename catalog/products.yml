@@ -1,0 +1,13 @@
+# 产品清单（章节不用写在这里：各产品目录下的 *.md 会自动进入目录）
+products:
+  - id: CX_ESP32_S31_Module_Xiaozhi_Board
+    title: ESP32-S3 小智板（模组方案）
+    status: 连载中
+    summary: |
+      基于 ESP32-S3 模组的小智定位开发板，面向语音交互与物联网原型验证。
+
+  - id: CX_ESP32_S31_Chip_Xiaozhi_Board
+    title: ESP32-S3 小智板（芯片方案）
+    status: 策划中
+    summary: |
+      基于 ESP32-S3 芯片裸板设计的小智板，便于成本优化与自定义外围。

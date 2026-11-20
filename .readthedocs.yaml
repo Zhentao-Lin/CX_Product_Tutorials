@@ -1,0 +1,17 @@
+# 在 https://readthedocs.org 关联 GitHub 仓库后，每次 push 会自动构建（界面与 Freenove 同源：sphinx-rtd-theme）
+version: "2"
+
+build:
+  os: ubuntu-22.04
+  tools:
+    python: "3.12"
+  jobs:
+    pre_build:
+      - python tools/cx_docs.py sync
+
+python:
+  install:
+    - requirements: docs/requirements.txt
+
+sphinx:
+  configuration: docs/source/conf.py
