@@ -42,6 +42,30 @@ NAV_FOOTER = """
 [← 返回本产品教程大纲](index.rst) · [↑ 返回总产品大纲](../../index.rst)
 """.strip()
 
+ASSET_SUBDIRS = ("images", "attachments", "code", "data")
+
+
+def ensure_product_asset_dirs(product_id: str) -> None:
+    """为每个产品创建 assets 子目录（images / attachments / code / data）。"""
+    base = PRODUCTS / product_id / "assets"
+    for name in ASSET_SUBDIRS:
+        d = base / name
+        d.mkdir(parents=True, exist_ok=True)
+        keep = d / ".gitkeep"
+        if not keep.exists():
+            keep.touch()
+
+
+def ensure_global_static_dirs() -> None:
+    for path in (
+        SOURCE / "_static" / "images",
+        SOURCE / "_static" / "downloads",
+    ):
+        path.mkdir(parents=True, exist_ok=True)
+        keep = path / ".gitkeep"
+        if not keep.exists():
+            keep.touch()
+
 
 def load_catalog() -> list[dict]:
     data = yaml.safe_load(CATALOG.read_text(encoding="utf-8"))
@@ -170,6 +194,7 @@ def ensure_nav_footer(md_path: Path) -> bool:
 
 
 def cmd_sync(_: argparse.Namespace) -> int:
+    ensure_global_static_dirs()
     products = load_catalog()
     seen: set[str] = set()
     for product in products:
@@ -177,6 +202,8 @@ def cmd_sync(_: argparse.Namespace) -> int:
         if pid in seen:
             raise SystemExit(f"重复的产品 ID: {pid}")
         seen.add(pid)
+        if (PRODUCTS / pid).is_dir():
+            ensure_product_asset_dirs(pid)
         chapters = list_chapters(pid)
         if not (PRODUCTS / pid).is_dir() and chapters:
             raise SystemExit(f"产品目录不存在: {PRODUCTS / pid}")
@@ -215,6 +242,7 @@ def cmd_new_product(args: argparse.Namespace) -> int:
     save_catalog(products)
 
     (PRODUCTS / pid).mkdir(parents=True, exist_ok=True)
+    ensure_product_asset_dirs(pid)
     # 可选首章
     if args.chapter:
         chap_file = args.chapter
@@ -257,14 +285,29 @@ def cmd_new_chapter(args: argparse.Namespace) -> int:
     return 0
 
 
-def run_sphinx(extra: list[str] | None = None) -> None:
-    BUILD_OUT.parent.mkdir(parents=True, exist_ok=True)
+def ensure_sphinx_deps() -> None:
+    try:
+        import sphinx  # noqa: F401
+        import yaml  # noqa: F401
+        import myst_parser  # noqa: F401
+        return
+    except ImportError:
+        pass
     req = ROOT / "docs" / "requirements.txt"
-    subprocess.run(
-        [sys.executable, "-m", "pip", "install", "-q", "-r", str(req)],
-        check=True,
+    r = subprocess.run(
+        [sys.executable, "-m", "pip", "install", "-r", str(req)],
         cwd=ROOT,
     )
+    if r.returncode != 0:
+        raise SystemExit(
+            "依赖安装失败。建议: python -m venv .venv && .venv\\Scripts\\activate && "
+            "pip install -r docs/requirements.txt"
+        )
+
+
+def run_sphinx(extra: list[str] | None = None) -> None:
+    BUILD_OUT.parent.mkdir(parents=True, exist_ok=True)
+    ensure_sphinx_deps()
     cmd = [
         sys.executable,
         "-m",

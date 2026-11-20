@@ -2,7 +2,31 @@
 
 ## 本章目标
 
-正文...
+简要说明本章内容。
+
+## 示意图
+
+![接线示意](assets/images/wiring-example.png)
+
+## 参数表
+
+| 项目 | 说明 |
+|------|------|
+| 供电 | 5V Type-C |
+| 主控 | ESP32-S3 |
+
+## 示例代码
+
+```cpp
+void setup() {
+    Serial.begin(115200);
+}
+```
+
+## 相关文件
+
+- [下载示例固件](assets/attachments/demo.bin)
+- 完整源码：[main.cpp](assets/code/main.cpp)
 
 ---
 

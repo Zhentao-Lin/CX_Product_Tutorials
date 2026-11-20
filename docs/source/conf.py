@@ -10,7 +10,11 @@ extensions = [
     "myst_parser",
     "sphinx.ext.extlinks",
     "sphinx.ext.autosectionlabel",
+    "sphinx_copybutton",
 ]
+
+copybutton_prompt_text = r">>> |\.\.\. |\$ |In \[\d*\]: | {2,5}\.\.\."
+copybutton_line_continuation_character = "\\"
 
 autosectionlabel_prefix_document = True
 
@@ -20,7 +24,11 @@ source_suffix = {
 }
 
 templates_path = ["_templates"]
-exclude_patterns = []
+# 不把 assets 里的说明文档当成站点页面
+exclude_patterns = [
+    "**/assets/**/*.md",
+    "**/assets/**/*.rst",
+]
 
 language = "zh_CN"
 

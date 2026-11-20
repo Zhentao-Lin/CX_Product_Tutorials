@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>CX 教程编辑器</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.css" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='editor.css') }}" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>CX 教程编辑器</h1>
+    <div class="actions">
+      <input id="commitMsg" type="text" placeholder="保存说明（可选）" />
+      <button type="button" id="btnSave" class="primary">保存</button>
+      <button type="button" id="btnPublish" class="accent">发布到网站</button>
+      <a href="https://zhentao-lin.github.io/CX_Product_Tutorials/" target="_blank" rel="noopener">打开线上站点</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <label>产品</label>
+      <select id="productSelect"></select>
+      <div class="chapter-head">
+        <label>章节</label>
+        <button type="button" id="btnNewChapter" title="新建章节">＋</button>
+      </div>
+      <ul id="chapterList"></ul>
+      <p class="hint">保存 = 本地 Git 提交；发布 = push，触发网站自动更新。</p>
+      <pre id="gitStatus" class="git-status"></pre>
+    </aside>
+
+    <main class="editor-pane">
+      <div class="toolbar">
+        <button type="button" data-snippet="table">插入表格</button>
+        <button type="button" data-snippet="code">插入代码块</button>
+        <button type="button" id="btnUploadImg">上传图片</button>
+        <input type="file" id="fileImg" accept="image/*" hidden />
+        <button type="button" id="btnDeleteChapter" class="danger">删除本章</button>
+      </div>
+      <textarea id="editor"></textarea>
+    </main>
+
+    <section class="preview-pane">
+      <h2>实时预览</h2>
+      <div id="preview" class="preview-body"></div>
+    </section>
+  </div>
+
+  <p id="toast" class="toast" hidden></p>
+
+  <script src="https://cdn.jsdelivr.net/npm/easymde/dist/easymde.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="{{ url_for('static', filename='editor.js') }}"></script>
+</body>
+</html>

@@ -3,3 +3,4 @@ sphinx-rtd-theme==3.0.1
 myst-parser==4.0.0
 docutils==0.21.2
 PyYAML==6.0.2
+sphinx-copybutton==0.5.2

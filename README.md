@@ -1,5 +1,9 @@
 # CX_Product_Tutorials
 
+> **新手请先看：** [新手入门-手把手教程.md](新手入门-手把手教程.md)  
+> **想点点鼠标就改教程：** 双击 [`start-editor.bat`](start-editor.bat) → [教程编辑器使用说明.md](教程编辑器使用说明.md)  
+> **教程网址：** https://zhentao-lin.github.io/CX_Product_Tutorials/
+
 Sphinx + **Read the Docs 主题**，浏览界面接近 [Freenove 在线教程](https://docs.freenove.com/en/latest/)。
 
 ## 你每天只需关心什么？
@@ -50,13 +54,21 @@ python tools/cx_docs.py serve
 ```text
 catalog/products.yml          # 仅产品元数据（id / title / summary / status）
 docs/source/
+  _static/images|downloads/   # 全站图片与附件
   index.rst                   # [自动生成] 总产品大纲
   products/<产品ID>/
     index.rst                 # [自动生成] 产品大纲
     01-xxx.md                 # [你编写] 章节正文
+    assets/                   # 本产品图片、ZIP、源码文件等
+      images/
+      attachments/
+      code/
+      data/
 tools/cx_docs.py
 build.ps1 / build.bat
 ```
+
+**图片、表格、代码、下载附件**怎么放、怎么写在 MD 里：见 [docs/assets-guide.md](docs/assets-guide.md)。
 
 ## 本地环境（可选）
 
