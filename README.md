@@ -1,4 +1,4 @@
-# CX-PRODUCT-TUTORIALS
+# CX_Product_Tutorials
 
 Sphinx + **Read the Docs 主题**，浏览界面接近 [Freenove 在线教程](https://docs.freenove.com/en/latest/)。
 

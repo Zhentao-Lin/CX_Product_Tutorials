@@ -1,7 +1,7 @@
 from datetime import datetime
 import os
 
-project = "CX-PRODUCT-TUTORIALS"
+project = "CX_Product_Tutorials"
 copyright = f"{datetime.now():%Y}, CX"
 author = "CX"
 release = "v0.1.0"

@@ -7,14 +7,14 @@
 
 ## 方案 A：GitHub Pages（推荐先启用）
 
-1. 推送仓库 `CX-PRODUCT-TUTORIALS` 到 GitHub。
+1. 推送仓库 `CX_Product_Tutorials` 到 GitHub。
 2. **Settings → Pages → Build and deployment → Source** 选 **GitHub Actions**。
 3. 之后每次 push `main`，workflow `.github/workflows/pages.yml` 会 `sphinx-build` 并部署。
-4. 访问：`https://<用户名>.github.io/CX-PRODUCT-TUTORIALS/`
+4. 访问：`https://<用户名>.github.io/CX_Product_Tutorials/`
 
 ## 方案 B：Read the Docs（与 Freenove 相同托管方式）
 
-1. 登录 [readthedocs.org](https://readthedocs.org)，**Import a Project**，选 GitHub 上的 `CX-PRODUCT-TUTORIALS`。
+1. 登录 [readthedocs.org](https://readthedocs.org)，**Import a Project**，选 GitHub 上的 `CX_Product_Tutorials`。
 2. 仓库根目录已有 `.readthedocs.yaml`，无需改构建命令。
 3. 每次 push，RTD webhook 自动构建；默认域名形如 `https://cx-product-tutorials.readthedocs.io/`。
 4. 可在 RTD 后台绑定自定义域名。
