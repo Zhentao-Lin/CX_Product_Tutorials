@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>超析小智 · 产品架构与学习路线</title>
+  <style>
+    :root {
+      --bg: #eef1f6; --card: #fff; --text: #1a1d26; --muted: #5c6478;
+      --esp32: #e85d04; --s3: #2d6a4f; --s31: #7b2cbf; --p4: #1d3557;
+      --accent: #0077b6; --line: #dde2eb; --shadow: 0 1px 3px rgba(26, 29, 38, 0.06), 0 4px 16px rgba(26, 29, 38, 0.04);
+      --fw: #e8f5ea; --hw: #f3ebff; --code: #e8f4fc;
+      --now: #fffbf0; --now-b: #e8c468;
+      --header: #023047;
+      --radius: 14px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; scroll-padding-top: 5.5rem; }
+    body { margin: 0; font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; font-size: 15px; }
+    a { color: var(--accent); }
+    a:hover { color: #005a8c; }
+    .shell { max-width: 980px; margin: 0 auto; padding: 0 1.25rem; }
+    header {
+      background: linear-gradient(145deg, #012a3d 0%, var(--header) 45%, #03496b 100%);
+      color: #fff; padding: 1.75rem 0 0; box-shadow: 0 4px 24px rgba(2, 48, 71, 0.25);
+    }
+    header h1 { margin: 0; font-size: 1.65rem; font-weight: 700; letter-spacing: -0.02em; }
+    header .lede { margin: 0.6rem 0 0; color: #b8d4e8; font-size: 0.92rem; line-height: 1.65; max-width: 46rem; }
+    .nav-bar {
+      position: sticky; top: 0; z-index: 100;
+      margin-top: 1.25rem; padding: 0.65rem 0;
+      background: rgba(2, 48, 71, 0.92); backdrop-filter: blur(10px);
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+    nav { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+    nav a {
+      color: #e8f4fc; font-size: 0.8rem; padding: 0.38rem 0.72rem;
+      background: rgba(255,255,255,0.08); border-radius: 999px; text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.12); transition: background 0.15s, border-color 0.15s;
+    }
+    nav a:hover { background: rgba(255,255,255,0.18); border-color: rgba(255,255,255,0.25); color: #fff; }
+    main { max-width: 980px; margin: 0 auto; padding: 1.5rem 1.25rem 3.5rem; }
+    .card {
+      background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
+      padding: 1.35rem 1.45rem; margin-bottom: 1.15rem; box-shadow: var(--shadow);
+    }
+    .card h2 {
+      margin: 0 0 1rem; font-size: 1.12rem; font-weight: 700; color: var(--text);
+      padding-bottom: 0.65rem; border-bottom: 2px solid #eef1f6;
+    }
+    .card-accent-s31 { border-top: 3px solid var(--s31); }
+    h3 { margin: 1.15rem 0 0.5rem; font-size: 0.95rem; font-weight: 600; color: var(--accent); }
+    .card > h3:first-of-type { margin-top: 0.25rem; }
+    .muted { color: var(--muted); font-size: 0.88rem; margin: 0 0 0.65rem; }
+    .muted:last-child { margin-bottom: 0; }
+    .prose p.muted + p.muted { margin-top: 0.35rem; }
+    .now-banner {
+      background: var(--now); border: 1px solid var(--now-b); border-radius: var(--radius);
+      padding: 1rem 1.2rem; margin-bottom: 1.25rem; font-size: 0.9rem; line-height: 1.65;
+      box-shadow: var(--shadow);
+    }
+    .loop-svg { width: 100%; height: auto; margin: 0.6rem 0; display: block; }
+    .tag { display: inline-block; font-size: 0.68rem; font-weight: 700; padding: 0.1rem 0.4rem; border-radius: 4px; margin-right: 0.2rem; }
+    .t-esp32 { background: #ffedd5; color: var(--esp32); }
+    .t-s3 { background: #d8f3dc; color: var(--s3); }
+    .t-s31 { background: #f3e8ff; color: var(--s31); }
+    .t-p4 { background: #dbe4f0; color: var(--p4); }
+    .table-scroll { overflow-x: auto; margin: 0.75rem 0; border-radius: 10px; border: 1px solid var(--line); -webkit-overflow-scrolling: touch; }
+    .table-scroll .sprint { margin: 0; min-width: 640px; }
+    table.sprint { width: 100%; border-collapse: collapse; font-size: 0.84rem; margin-top: 0.6rem; }
+    .table-scroll table.sprint { margin-top: 0; }
+    .sprint th, .sprint td { border: 1px solid var(--line); padding: 0.72rem 0.85rem; vertical-align: top; line-height: 1.55; }
+    .sprint th { background: #f0f3f8; font-weight: 600; font-size: 0.8rem; color: #3d4556; }
+    .sprint tbody tr:nth-child(even) { background: #fafbfc; }
+    .sprint .wk { width: 3rem; text-align: center; font-weight: 700; color: var(--accent); white-space: nowrap; vertical-align: middle; }
+    table.sprint-product { table-layout: fixed; }
+    table.sprint-product .col-idx { width: 2.25rem; }
+    table.sprint-product .col-prod { width: 19%; }
+    table.sprint-product .col-goal { width: 21%; }
+    table.sprint-product td.col-goal { font-size: 0.82rem; color: #3d4556; }
+    table.sprint-product td.col-hw { font-size: 0.82rem; line-height: 1.5; }
+    .prod-cell { display: flex; flex-direction: column; gap: 0.28rem; }
+    .prod-cell .prod-name { font-weight: 600; font-size: 0.86rem; line-height: 1.35; }
+    .prod-cell .prod-meta { font-size: 0.76rem; color: var(--muted); line-height: 1.35; }
+    .prod-cell .prod-meta a { font-weight: 500; }
+    table.sprint-curriculum { table-layout: fixed; min-width: 680px; }
+    table.sprint-curriculum .col-ch { width: 2.6rem; text-align: center; font-size: 0.95rem; }
+    table.sprint-curriculum .col-sec { width: 4.25rem; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; font-size: 0.8rem; color: #3d4556; vertical-align: middle; }
+    table.sprint-curriculum .col-pkg { width: 5.75rem; text-align: center; vertical-align: middle; line-height: 1.4; }
+    table.sprint-curriculum .col-pkg .tag { margin: 0.12rem 0; }
+    table.sprint-curriculum thead .col-sec { white-space: nowrap; }
+    table.sprint-mile { table-layout: fixed; }
+    table.sprint-mile .col-sec { width: 6.5rem; text-align: center; white-space: nowrap; font-variant-numeric: tabular-nums; vertical-align: middle; }
+    table.sprint-steps .wk { width: 2.6rem; }
+    table.sprint-steps td:last-child { width: 5.75rem; text-align: center; vertical-align: middle; line-height: 1.45; }
+    .table-scroll-curriculum .sprint { min-width: 680px; }
+    .table-scroll-product .sprint { min-width: 560px; }
+    .col-hw { background: var(--hw); }
+    .col-code { background: var(--code); }
+    .col-fw { background: var(--fw); }
+    code, .path {
+      font-family: Consolas, "Cascadia Code", "SF Mono", monospace; font-size: 0.8rem;
+      background: #f4f6f9; padding: 0.1em 0.35em; border-radius: 4px;
+    }
+    code { word-break: break-word; }
+    .path { word-break: break-all; background: transparent; padding: 0; }
+    .phase-block {
+      border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.1rem;
+      margin-top: 1rem; background: #fafbfc;
+      border-left: 4px solid var(--accent);
+    }
+    .phase-block h3 { margin-top: 0; color: var(--text); }
+    .phase-block .table-scroll { margin-bottom: 0; }
+    .checklist { list-style: none; padding: 0; margin: 0.5rem 0 0; display: grid; gap: 0.5rem; }
+    .checklist li {
+      display: flex; gap: 0.65rem; padding: 0.65rem 0.75rem; font-size: 0.88rem;
+      background: #f8f9fc; border: 1px solid var(--line); border-radius: 10px;
+      align-items: flex-start;
+    }
+    .checklist input { width: 1.05rem; height: 1.05rem; margin-top: 0.15rem; flex-shrink: 0; accent-color: var(--accent); }
+    .checklist label { flex: 1; }
+    .boards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.45rem; margin-top: 0.6rem; }
+    @media (max-width: 700px) { .boards { grid-template-columns: repeat(2, 1fr); } .sprint { font-size: 0.76rem; } }
+    .board { border-radius: 8px; padding: 0.55rem; text-align: center; font-size: 0.76rem; border: 2px solid var(--line); }
+    .board b { display: block; font-size: 0.82rem; }
+    .link-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem 1.5rem; margin-top: 0.5rem; }
+    @media (max-width: 640px) { .link-grid { grid-template-columns: 1fr; } }
+    .link-grid h3 { margin: 0 0 0.4rem; font-size: 0.88rem; }
+    .link-grid ul { margin: 0; padding-left: 1.15rem; font-size: 0.86rem; line-height: 1.7; }
+    .links.card a { font-size: 0.86rem; }
+    footer { text-align: center; color: var(--muted); font-size: 0.82rem; padding: 1.5rem 1rem 2rem; border-top: 1px solid var(--line); background: #fff; }
+    .modes { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-top: 0.5rem; }
+    @media (max-width: 640px) { .modes { grid-template-columns: 1fr; } }
+    .mode { border-radius: 10px; padding: 0.75rem; font-size: 0.86rem; border: 2px solid var(--line); }
+    .mode h3 { margin: 0 0 0.35rem; font-size: 0.92rem; color: inherit; }
+    .mode-p4 { background: #f3f6fb; border-color: var(--p4); }
+    .mode-s31 { background: #faf5ff; border-color: var(--s31); }
+    .grid4 { display: grid; grid-template-columns: 1fr 1fr; gap: 0.65rem; margin-top: 0.6rem; }
+    @media (max-width: 640px) { .grid4 { grid-template-columns: 1fr; } }
+    .prod { border-radius: 10px; padding: 0.75rem; font-size: 0.85rem; border: 2px solid var(--line); }
+    .prod h3 { margin: 0 0 0.3rem; font-size: 0.9rem; color: var(--text); }
+    .prod ul { margin: 0.35rem 0 0; padding-left: 1.1rem; }
+    .p1 { border-color: var(--esp32); background: #fff8f3; }
+    .p2 { border-color: var(--s3); background: #f4fbf7; }
+    .p3 { border-color: var(--s31); background: #faf5ff; }
+    .p4 { border-color: var(--p4); background: #f3f6fb; }
+    .t1 { background: #ffedd5; color: var(--esp32); }
+    .t2 { background: #d8f3dc; color: var(--s3); }
+    .t3 { background: #f3e8ff; color: var(--s31); }
+    .t4 { background: #dbe4f0; color: var(--p4); }
+    .tip {
+      background: linear-gradient(90deg, #e8f4fc 0%, #f4f9fd 100%);
+      border: 1px solid #c5e4f3; border-left: 4px solid var(--accent);
+      padding: 0.85rem 1.05rem; border-radius: 0 10px 10px 0; font-size: 0.88rem;
+      margin-top: 1rem; line-height: 1.6;
+    }
+    .pipeline {
+      display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.35rem;
+      padding: 0.9rem 1rem; margin-top: 0.5rem;
+      background: linear-gradient(135deg, #f8f9fc, #fff); border-radius: 12px; border: 1px solid var(--line);
+    }
+    .pipeline .arr { color: #9aa3b5; font-size: 0.7rem; user-select: none; padding: 0 0.1rem; }
+    .step { padding: 0.42rem 0.75rem; border-radius: 8px; font-size: 0.78rem; font-weight: 600; color: #fff; white-space: nowrap; }
+    .chapter-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.5rem; margin: 0.85rem 0;
+    }
+    @media (max-width: 720px) { .chapter-grid { grid-template-columns: repeat(2, 1fr); } }
+    .chapter-pill {
+      padding: 0.55rem 0.5rem; border-radius: 10px; font-size: 0.78rem; font-weight: 600;
+      color: #fff; text-align: center; line-height: 1.35; box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+    }
+    .chapter-pill small { display: block; font-weight: 500; opacity: 0.92; font-size: 0.72rem; margin-top: 0.15rem; }
+    .part-title {
+      font-size: 0.72rem; letter-spacing: 0.12em; font-weight: 700;
+      color: var(--muted); text-transform: uppercase; margin: 1.75rem 0 0.75rem;
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .part-title::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+    .col-doc { background: #f6f8fb; }
+    .learn-step { margin: 0.35rem 0 0; padding-left: 1.25rem; font-size: 0.88rem; line-height: 1.65; }
+    .learn-step li { margin: 0.35rem 0; }
+    .tag-pkg { font-size: 0.72rem; }
+    .curriculum-block {
+      border: 1px solid var(--line); border-radius: 12px; padding: 1rem 1.1rem;
+      margin-top: 1.15rem; background: #fafbfc;
+    }
+    .curriculum-block:first-of-type { margin-top: 0.65rem; }
+    .curriculum-block h3 { margin-top: 0; color: var(--text); font-size: 0.98rem; }
+    .curriculum-block.l2 { border-left: 4px solid #9d4edd; }
+    .curriculum-block.l3 { border-left: 4px solid var(--p4); }
+    .curriculum-block.l4 { border-left: 4px solid var(--accent); }
+    .curriculum-block.l5 { border-left: 4px solid var(--s3); }
+    .card-accent-mosaico { border-top: 3px solid #9d4edd; }
+    .card-accent-p4 { border-top: 3px solid var(--p4); }
+    .card-accent-node { border-top: 3px solid var(--accent); }
+    .card-accent-s3 { border-top: 3px solid var(--s3); }
+    @media (max-width: 700px) {
+      header h1 { font-size: 1.35rem; }
+      .card { padding: 1.1rem 1rem; }
+      table.sprint { font-size: 0.78rem; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="shell">
+      <h1>超析小智 · 产品架构与学习路线</h1>
+      <p class="lede">五类产品主线：2×S31 → P4 七寸 → 外设 → S3 互动（<strong>5a 狗 / 5b 摆件 / 5c 小车</strong>）。学习阶段 L0～L5；每 SKU 循序渐进见 <a href="#s31-curriculum" style="color:#9dd4ff">L1·48 节</a> 与 <a href="#product-curricula" style="color:#9dd4ff">L2～L5 课纲</a>。</p>
+    </div>
+    <div class="nav-bar">
+      <div class="shell">
+        <nav aria-label="页面导航">
+          <a href="#product-line">产品架构</a>
+          <a href="#hw-order">硬件顺序</a>
+          <a href="#learn-path">学习路线</a>
+          <a href="#s31-curriculum">L1·S31</a>
+          <a href="#product-curricula">L2～L5</a>
+          <a href="#cx-docs">教程站</a>
+          <a href="#stages">阶段课表</a>
+          <a href="#loop">学习闭环</a>
+          <a href="#labs">官方示例</a>
+          <a href="#check">验收</a>
+          <a href="#links">链接</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="now-banner">
+      <strong>先做 2 块 S31</strong>：① 最小系统板（走线 v1.1 + 配套固件与教学站，单板回血）② Mosaico 兼容廉价版（跟官方 xiaozhi board，少维护）。<br/>
+      然后 <strong>P4 七寸 MIPI</strong> → <strong>ESP 外设</strong> → 第 5 类互动：<strong>5a 机器狗</strong> · <strong>5b 桌面摆件</strong> · <strong>5c 多功能小车</strong>（同定位，可并行）。
+    </section>
+
+    <p class="part-title">一、产品与架构</p>
+
+    <section class="card" id="product-line">
+      <h2>研发主线（产品架构）</h2>
+      <div class="table-scroll table-scroll-product"><table class="sprint sprint-product">
+        <colgroup>
+          <col class="col-idx" />
+          <col class="col-prod" />
+          <col class="col-goal" />
+          <col />
+        </colgroup>
+        <thead><tr><th class="wk col-idx">#</th><th class="col-prod">产品</th><th class="col-goal">商业/学习目标</th><th>硬件与固件要点</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="wk">1</td>
+            <td class="col-prod">
+              <div class="prod-cell">
+                <span class="prod-name">S31 最小系统板</span>
+                <span class="prod-meta">v1.1 走线 · <a href="#s31-curriculum">课纲 48 节</a></span>
+              </div>
+            </td>
+            <td class="col-goal">单板出售 · 教学网站 · 学习成本可控 · 先回血</td>
+            <td class="col-hw">复用 <span class="path">chaoxi-esp32-s31-wroom-1-board</span>；打包一键例程 + OTA；网站与板子 SKU 绑定</td>
+          </tr>
+          <tr>
+            <td class="wk">2</td>
+            <td class="col-prod">
+              <div class="prod-cell">
+                <span class="prod-name">S31 Mosaico 兼容</span>
+                <span class="prod-meta"><a href="#l2-curriculum">五步课纲</a></span>
+              </div>
+            </td>
+            <td class="col-goal">尽可能便宜 · 好卖 · 不做主力维护</td>
+            <td class="col-hw">引脚/分区对齐 <code>esp-mosaico</code>（v1.0/v1.2）；能砍则砍（屏/IMU/NAND 按 BOM 分级）；固件跟 upstream xiaozhi</td>
+          </tr>
+          <tr>
+            <td class="wk">3</td>
+            <td class="col-prod">
+              <div class="prod-cell">
+                <span class="prod-name">P4 七寸 MIPI</span>
+                <span class="prod-meta"><a href="#l3-curriculum">五步课纲</a></span>
+              </div>
+            </td>
+            <td class="col-goal">学 LVGL · 小智版电子相册 · 可当全屋中控</td>
+            <td class="col-hw">在现有 7 寸样机上迭代：相册 Web/本地 · 对话/音乐 · <code>home.*</code> MCP（已有 LVGL + xiaozhi 基础）</td>
+          </tr>
+          <tr>
+            <td class="wk">4</td>
+            <td class="col-prod">
+              <div class="prod-cell">
+                <span class="prod-name">ESP32 / ESP8266 外设</span>
+                <span class="prod-meta"><a href="#l4-curriculum">五步课纲</a></span>
+              </div>
+            </td>
+            <td class="col-goal">小智辅助设备 · 远程控制</td>
+            <td class="col-hw">先做 MCP 继电器；再盆栽湿度 · 鱼塘水质 · 果蔬温湿度 · 鱼缸溶氧等采集类；经 P4 或 MQTT 主题统一</td>
+          </tr>
+          <tr>
+            <td class="wk">5</td>
+            <td class="col-prod">
+              <div class="prod-cell">
+                <span class="prod-name">S3 狗 / 摆件 / 小车</span>
+                <span class="prod-meta"><a href="#l5-curriculum">5a·b·c 课纲</a></span>
+              </div>
+            </td>
+            <td class="col-goal">展示与互动 · 非当前现金流主力</td>
+            <td class="col-hw"><strong>5a</strong> Freenove 四足 + 舵机 · <strong>5b</strong> 长条屏 / emote_gfx · <strong>5c</strong> 电机 + 循迹/避障/遥控；可选 MQTT <code>robot/*</code></td>
+          </tr>
+        </tbody>
+      </table></div>
+      <div class="tip"><strong>节奏建议：</strong>先冻结「最小系统」v1.1 再开 Mosaico 兼容 PCB（可共用 S31 核心与电源，外设区按官方手册拆）。两块 S31 不要共用一个 SKU 名，避免售后与教程混乱。</div>
+    </section>
+
+    <section class="card" id="hw-order">
+      <h2>硬件打样顺序</h2>
+      <div class="pipeline" aria-label="打样顺序">
+        <span class="step" style="background:#5c6478">0 规范</span>
+        <span class="arr">›</span>
+        <span class="step" style="background:var(--s31)">1 S31 最小</span>
+        <span class="arr">›</span>
+        <span class="step" style="background:#9d4edd">2 Mosaico</span>
+        <span class="arr">›</span>
+        <span class="step" style="background:var(--p4)">3 P4 七寸</span>
+        <span class="arr">›</span>
+        <span class="step" style="background:var(--esp32)">4 外设</span>
+        <span class="arr">›</span>
+        <span class="step" style="background:var(--s3)">5a/b/c 互动</span>
+      </div>
+      <div class="table-scroll"><table class="sprint" style="margin-top:0.75rem">
+        <thead><tr><th class="wk">序</th><th>板</th><th>硬件里程碑</th></tr></thead>
+        <tbody>
+          <tr><td class="wk">0</td><td>规范</td><td>引脚表 · KiCad · 两版 S31 命名与丝印规则 · 外设接插件</td></tr>
+          <tr><td class="wk">1</td><td>CX-S31-MINI</td><td>仅改走线/地/声学；冻结 v1.1；配教学站大纲</td></tr>
+          <tr><td class="wk">2</td><td>CX-S31-MOSA</td><td>对照官方 Mosaico 原理：扩展座/屏/传感器按成本分级 BOM</td></tr>
+          <tr><td class="wk">3</td><td>CX-P4-7</td><td>MIPI 7 寸 + 存储 + 音频；触摸与结构件一次定型</td></tr>
+          <tr><td class="wk">4</td><td>CX-NODE</td><td>ESP32 或 ESP12 模组板：继电器版 → I2C/ADC 采集版</td></tr>
+          <tr><td class="wk">5a</td><td>CX-S3-DOG</td><td>ESP32-S3 机器狗：舵机电源 · 骨架接口 · 沿用 Freenove 软件栈参考</td></tr>
+          <tr><td class="wk">5b</td><td>CX-DESK-ORN</td><td>桌面摆件：长条屏/外壳 · 表情或静态展示 · 可与 5a 共用 S3 模组</td></tr>
+          <tr><td class="wk">5c</td><td>CX-S3-CAR</td><td>多功能小车：驱动电源 · 电机接口 · 传感器座（与 5a/5b 并行，优先级同级）</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <p class="part-title">二、官方仓库 × 研发计划（学习路线）</p>
+
+    <section class="card" id="learn-path">
+      <h2>总路线：先跟乐鑫主线，再落到你的 SKU</h2>
+      <p class="muted">原则：<strong>每个产品阶段 = 1 条官方例程链 + 1 个可发货固件</strong>。硬件画板与官方 dev-kit/设计指南对照；软件优先跑通 <a href="https://github.com/espressif/esp-idf/tree/master/examples">esp-idf/examples</a>，再迁入 <a href="https://github.com/78/xiaozhi-esp32">xiaozhi-esp32</a> 或独立节点工程。</p>
+      <div class="table-scroll"><table class="sprint">
+        <thead><tr><th class="wk">阶段</th><th>你的产品</th><th>乐鑫主线（仓库 / 站点）</th><th>自有教程 / 板级</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="wk">L0</td>
+            <td>共用底座</td>
+            <td class="col-doc"><a href="https://github.com/espressif/esp-idf">esp-idf</a> · <a href="https://github.com/espressif/esp-dev-kits">esp-dev-kits</a> · <a href="https://github.com/espressif/esp-hardware-design-guidelines">硬件设计指南</a> · <a href="https://github.com/espressif/kicad-libraries">kicad-libraries</a></td>
+            <td>引脚表模板；IDF 版本与 xiaozhi 对齐（S31 见 IDF master / 6.x）</td>
+          </tr>
+          <tr>
+            <td class="wk">L1</td>
+            <td><strong>B1</strong> S31 最小系统</td>
+            <td class="col-doc"><a href="https://github.com/espressif/esp-sr">esp-sr</a> · <a href="https://components.espressif.com/components/espressif/esp_codec_dev">esp_codec_dev</a> · <a href="https://components.espressif.com/components/espressif/led_strip">led_strip</a> · <a href="https://github.com/espressif/esp-board-manager">esp-board-manager</a></td>
+            <td><a href="#s31-curriculum">48 节课纲</a> · <code>CX_S31_Mini_Xiaozhi</code>；<a href="../CX-ESP32-S31_循序渐进教程.html">循序渐进 HTML</a>；<span class="path">chaoxi-esp32-s31-wroom-1-board</span></td>
+          </tr>
+          <tr>
+            <td class="wk">L2</td>
+            <td><strong>B2</strong> Mosaico 兼容</td>
+            <td class="col-doc"><a href="https://mosaico.espressif.com">mosaico.espressif.com</a> · <a href="https://github.com/espressif/esp-bsp">esp-bsp</a>（LCD/触摸）· <a href="https://components.espressif.com/components/espressif/esp32-camera">esp32-camera</a> · 扩展 IMU/NAND 见 bsp 与 <a href="https://github.com/espressif/esp-iot-solution">esp-iot-solution</a></td>
+            <td><a href="#l2-curriculum">5 步课纲</a> · <code>CX_S31_Mosaico_Compat</code>；xiaozhi <code>esp-mosaico</code>；自有 <code>boards/</code> 薄封装</td>
+          </tr>
+          <tr>
+            <td class="wk">L3</td>
+            <td><strong>C</strong> P4 七寸中枢</td>
+            <td class="col-doc"><a href="https://github.com/espressif/esp-brookesia">esp-brookesia</a> · esp-bsp <code>esp_lvgl_port</code> · <a href="https://github.com/espressif/esp-iot-solution/tree/master/examples/camera">iot-solution 显示/相机</a> · MIPI 屏驱动组件（如 esp_lcd_jd9365 等）</td>
+            <td><a href="#l3-curriculum">5 步课纲</a> · <code>CX_P4_7in_Album_Hub</code>；现有 7 寸 MIPI + LVGL + xiaozhi</td>
+          </tr>
+          <tr>
+            <td class="wk">L4</td>
+            <td><strong>A</strong> ESP 外设节点</td>
+            <td class="col-doc"><a href="https://github.com/espressif/esp-mqtt">esp-mqtt</a> · idf <code>protocols/mqtt</code> · <code>peripherals/{gpio,adc,i2c}</code> · iot-solution 传感器例程</td>
+            <td><a href="#l4-curriculum">5 步课纲</a> · <code>CX_Node_MQTT</code>；<code>cx-node-fw</code>；ESP8266_RTOS_SDK 同主题</td>
+          </tr>
+          <tr>
+            <td class="wk">L5</td>
+            <td><strong>D</strong> 5a 狗 · 5b 摆件 · 5c 小车</td>
+            <td class="col-doc">舵机/电机：<code>peripherals/mcpwm</code> · LEDC · <code>pcnt</code>；摆件：<a href="https://github.com/espressif2022/esp_emote_gfx">esp_emote_gfx</a>；传感器/遥控：<code>i2c</code> · 蓝牙例程</td>
+            <td><a href="#l5-curriculum">5a/b/c 课纲</a> · <code>CX_S3_Robot_Dog</code> · <code>CX_Desk_Ornament</code> · <code>CX_S3_Multi_Car</code>；共用 <code>robot/*</code>（可选）</td>
+          </tr>
+          <tr>
+            <td class="wk">∞</td>
+            <td>量产 / 认证</td>
+            <td class="col-doc"><a href="https://github.com/espressif/esp-jumpstart">esp-jumpstart</a> · idf <code>security/*</code> · <code>system/ota</code></td>
+            <td>jumpstart 检查项写入教程「量产附录」；固件 tag = Pages 文内版本号</td>
+          </tr>
+        </tbody>
+      </table></div>
+      <div class="tip"><strong>各 SKU 课时</strong>：<a href="#s31-curriculum">L1·48 节</a>（发货最小包）；<a href="#product-curricula">L2～L5</a> 按表内「教程包」推进后写进 <a href="https://github.com/Zhentao-Lin/CX_Product_Tutorials">CX_Product_Tutorials</a>。L1 完整目录 <a href="../CX-ESP32-S31_循序渐进教程.html">循序渐进 HTML</a>。</div>
+    </section>
+
+    <section class="card card-accent-s31" id="s31-curriculum">
+      <h2>L1 · CX-ESP32-S31 循序渐进（48 节提炼）</h2>
+      <div class="prose">
+        <p class="muted">来源：<a href="../CX-ESP32-S31_循序渐进教程.html">循序渐进教程目录</a>。板载：ESP32-S31-WROOM-1 · ES8311 + 硅麦 · TF · WS2812 · DVP 摄 · 双 USB · Wi-Fi 6 / BT 5.4。</p>
+        <p class="muted"><strong>前提：</strong>ESP-IDF <code>master</code> / 6.x；<a href="https://github.com/espressif/esp-dev-kits">esp-dev-kits</a> · <a href="https://github.com/espressif/esp-board-manager">esp-board-manager</a>。①～⑥、⑧ 仅板载；<strong>⑦</strong> 需配套扩展板。</p>
+      </div>
+      <div class="chapter-grid" aria-label="八篇流程">
+        <span class="chapter-pill" style="background:#4f46e5">① 环境<small>01～05</small></span>
+        <span class="chapter-pill" style="background:#0891b2">② 外设<small>06～13</small></span>
+        <span class="chapter-pill" style="background:#d97706">③ 音频存储<small>14～18</small></span>
+        <span class="chapter-pill" style="background:#7c3aed">④ 摄像头<small>19～22</small></span>
+        <span class="chapter-pill" style="background:#059669">⑤ Wi-Fi<small>23～27</small></span>
+        <span class="chapter-pill" style="background:#2563eb">⑥ 蓝牙<small>28～32</small></span>
+        <span class="chapter-pill" style="background:#e11d48">⑦ 扩展板<small>33～44</small></span>
+        <span class="chapter-pill" style="background:#334155">⑧ 综合<small>45～48</small></span>
+      </div>
+    <div class="table-scroll table-scroll-curriculum"><table class="sprint sprint-curriculum">
+      <thead><tr><th class="wk col-ch">篇</th><th class="col-sec">节</th><th>学什么（板载/扩展）</th><th class="col-doc">乐鑫主线</th><th class="col-pkg">教程包</th></tr></thead>
+      <tbody>
+        <tr>
+          <td class="wk col-ch">①</td>
+          <td class="col-sec">01–05</td>
+          <td>认识板子 · 装 IDF · <code>hello_world</code> · menuconfig/日志 · 工程结构</td>
+          <td class="col-doc">ESP32-S31 快速入门 · <code>get-started/hello_world</code></td>
+          <td class="col-pkg"><span class="tag t3">最小包</span></td>
+        </tr>
+        <tr>
+          <td class="wk col-ch">②</td>
+          <td class="col-sec">06–13</td>
+          <td>USB-JTAG · GPIO/按键 · LEDC · <strong>WS2812</strong> · USB OTG · 低功耗 · 安全启动（量产前）</td>
+          <td class="col-doc"><code>peripherals/gpio</code> · <code>ledc</code> · <code>led_strip</code> · <code>usb/otg</code> · <code>security/*</code></td>
+          <td class="col-pkg"><span class="tag t3">最小包</span></td>
+        </tr>
+        <tr>
+          <td class="wk col-ch">③</td>
+          <td class="col-sec">14–18</td>
+          <td>TF 卡 · FATFS · <strong>I2S 放音/录音</strong>（ES8311）· 录放闭环</td>
+          <td class="col-doc"><code>sdmmc</code> · <code>fatfs</code> · <code>i2s</code> · <code>esp_codec_dev</code></td>
+          <td class="col-pkg"><span class="tag t3">最小包</span></td>
+        </tr>
+        <tr>
+          <td class="wk col-ch">④</td>
+          <td class="col-sec">19–22</td>
+          <td>DVP 摄像头 · JPEG · 存卡/回传 · <strong>网页摄像头</strong>（依赖⑤ Wi-Fi）</td>
+          <td class="col-doc"><code>esp32-camera</code> · <code>esp_video</code> · CameraWebServer</td>
+          <td class="col-pkg"><span class="tag t-esp32">拓展</span></td>
+        </tr>
+        <tr>
+          <td class="wk col-ch">⑤</td>
+          <td class="col-sec">23–27</td>
+          <td>STA/AP · 配网 · Socket · SNTP/HTTP · <strong>MQTT</strong></td>
+          <td class="col-doc"><code>wifi/getting_started</code> · <code>esp_wifi_provisioning</code> · <code>mqtt</code> · <code>esp_http_client</code></td>
+          <td class="col-pkg"><span class="tag t3">最小包</span></td>
+        </tr>
+        <tr>
+          <td class="wk col-ch">⑥</td>
+          <td class="col-sec">28–32</td>
+          <td>经典 BT SPP · BLE GATT · A2DP · LE Audio · AVRCP</td>
+          <td class="col-doc"><code>bluetooth/classic</code> · <code>bluetooth/ble</code> · esp-adf（音频）</td>
+          <td class="col-pkg"><span class="tag t-esp32">选修</span></td>
+        </tr>
+        <tr>
+          <td class="wk col-ch">⑦</td>
+          <td class="col-sec">33–44</td>
+          <td>ADC · I2C 传感器/OLED · Touch · UART · SPI 屏 · 图片 · <strong>LVGL + 触摸</strong></td>
+          <td class="col-doc"><code>adc</code> · <code>i2c</code> · <code>esp_lcd</code> · esp-bsp <code>esp_lvgl_port</code></td>
+          <td class="col-pkg"><span class="tag t-esp32">扩展板包</span></td>
+        </tr>
+        <tr>
+          <td class="wk col-ch">⑧</td>
+          <td class="col-sec">45–48</td>
+          <td><strong>esp-sr</strong> 唤醒 · <strong>小智 46～47</strong>（板级适配）· 可视门铃综合</td>
+          <td class="col-doc"><a href="https://github.com/espressif/esp-sr">esp-sr</a> · <a href="https://github.com/78/xiaozhi-esp32">xiaozhi-esp32</a> · <span class="path">chaoxi-esp32-s31-wroom-1-board</span></td>
+          <td class="col-pkg"><span class="tag t3">最小包</span><br/><span class="tag-pkg muted">46–47</span> <span class="tag-pkg muted">48 拓展</span></td>
+        </tr>
+      </tbody>
+    </table></div>
+    <h3>与研发 / 发货里程碑对齐</h3>
+    <div class="table-scroll"><table class="sprint sprint-mile">
+      <thead><tr><th class="wk">里程碑</th><th class="col-sec">对应教程节</th><th>过关（可写进 CX_Product_Tutorials）</th></tr></thead>
+      <tbody>
+        <tr><td class="wk">M0</td><td class="col-sec">01–05</td><td>IDF 可编译烧录、monitor 有日志</td></tr>
+        <tr><td class="wk">M1</td><td class="col-sec">07–10</td><td>GPIO/按键/LEDC/WS2812 与原理图引脚一致</td></tr>
+        <tr><td class="wk">M2</td><td class="col-sec">14–18</td><td>TF 读写 · 喇叭放音 · 麦录音无明显噪</td></tr>
+        <tr><td class="wk">M3</td><td class="col-sec">23–27+OTA</td><td>STA 获 IP · MQTT publish · <code>system/ota</code> 一次成功</td></tr>
+        <tr><td class="wk">M4</td><td class="col-sec">46–47</td><td>小智对话 + <code>self.*</code> MCP（发货固件 tag）</td></tr>
+        <tr><td class="wk">M5</td><td class="col-sec">v1.1 PCB</td><td>同上项目在自有板复测 · 同步 <code>CX_S31_Mini_Xiaozhi</code></td></tr>
+        <tr><td class="wk">—</td><td class="col-sec">④⑥⑦</td><td>摄像头/蓝牙/扩展板 LVGL 进「完整版」不挡首发</td></tr>
+      </tbody>
+    </table></div>
+    <div class="tip"><strong>最小发货包：</strong>①②③⑤ + ⑧-46/47（约 27 节 + 板级两节）。<strong>完整版教程站</strong>可连载 ④摄像头、⑥蓝牙、⑦扩展板 LVGL、⑧-48 门铃。<strong>Mosaico（L2）</strong>在最小包过关后再跟官方 <code>esp-mosaico</code>，不单靠 ⑦ 方屏课代替。</div>
+  </section>
+
+    <section class="card card-accent-mosaico" id="product-curricula">
+      <h2>L2～L5 · 各产品循序渐进（乐鑫主线提炼）</h2>
+      <p class="muted">版式对齐 <a href="#s31-curriculum">L1·48 节</a>：每步 = <strong>学什么</strong> + <strong>乐鑫仓库/站点</strong> + <strong>教程包</strong>（最小发货 / 拓展）。过关写进对应 <code>products.yml</code> 产品 ID。</p>
+
+      <div class="curriculum-block l2" id="l2-curriculum">
+        <h3>L2 · B2 S31 Mosaico 兼容 · <code>CX_S31_Mosaico_Compat</code> · <code>CX-S31-MOSA</code></h3>
+        <p class="muted"><strong>前提：</strong>L1 最小包 ≥ M3（Wi-Fi/MQTT 会调）；不重讲 ES8311/小智板级，只管「官方 esp-mosaico 能刷 + 差异可说明」。</p>
+        <div class="chapter-grid" aria-label="五步流程">
+          <span class="chapter-pill" style="background:#5c6478">① 前置<small>差异/BOM</small></span>
+          <span class="chapter-pill" style="background:#9d4edd">② 官方构建<small>esp-mosaico</small></span>
+          <span class="chapter-pill" style="background:#7c3aed">③ 方屏触摸<small>QSPI LCD</small></span>
+          <span class="chapter-pill" style="background:#2563eb">④ 可选外设<small>相机/IMU</small></span>
+          <span class="chapter-pill" style="background:#334155">⑤ 薄板级<small>boards/</small></span>
+        </div>
+        <div class="table-scroll table-scroll-curriculum"><table class="sprint sprint-curriculum sprint-steps">
+          <thead><tr><th class="wk">步</th><th>学什么</th><th class="col-doc">乐鑫主线</th><th class="col-pkg">教程包</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="wk">①</td>
+              <td>对照官方硬件手册：扩展座 · 480 方屏 · 硅麦/喇叭 · 与 B1 最小系统 BOM/走线差异表</td>
+              <td class="col-doc"><a href="https://mosaico.espressif.com">mosaico.espressif.com</a> 硬件 · <a href="https://github.com/espressif/esp-hardware-design-guidelines">硬件设计指南</a></td>
+              <td><span class="tag t3">最小包</span></td>
+            </tr>
+            <tr>
+              <td class="wk">②</td>
+              <td>clone xiaozhi · <code>python3 scripts/build.py espressif/esp-mosaico</code> · 量产分区/版本记录</td>
+              <td class="col-doc"><a href="https://github.com/78/xiaozhi-esp32">xiaozhi-esp32</a> · IDF <code>master</code>/6.x（与 Mosaico 要求对齐）</td>
+              <td><span class="tag t3">最小包</span></td>
+            </tr>
+            <tr>
+              <td class="wk">③</td>
+              <td>QSPI LCD 点亮 · 触摸校准 · LVGL 与官方 UI 一致（不全靠 L1⑦ 方屏课代替）</td>
+              <td class="col-doc"><a href="https://github.com/espressif/esp-bsp">esp-bsp</a> · <code>peripherals/lcd</code> · <code>esp_lvgl_port</code></td>
+              <td><span class="tag t3">最小包</span></td>
+            </tr>
+            <tr>
+              <td class="wk">④</td>
+              <td>可选：DVP/USB 摄像头子板 · 扩展座 IMU/NAND；文档写「插拔/不支持项」</td>
+              <td class="col-doc"><a href="https://components.espressif.com/components/espressif/esp32-camera">esp32-camera</a> · <a href="https://github.com/espressif/esp-iot-solution">esp-iot-solution</a></td>
+              <td><span class="tag t-esp32">拓展</span></td>
+            </tr>
+            <tr>
+              <td class="wk">⑤</td>
+              <td>引脚与官方 <code>config.h</code> 一致则零改；否则 <code>boards/cx-s31-mosa</code> 薄封装 + 刷机说明「选 esp-mosaico」</td>
+              <td class="col-doc"><a href="https://github.com/espressif/esp-board-manager">esp-board-manager</a></td>
+              <td><span class="tag t3">最小包</span></td>
+            </tr>
+          </tbody>
+        </table></div>
+        <h3>里程碑（B2）</h3>
+        <div class="table-scroll"><table class="sprint">
+          <thead><tr><th class="wk">里程碑</th><th>对应步骤</th><th>过关（CX_Product_Tutorials）</th></tr></thead>
+          <tbody>
+            <tr><td class="wk">M0</td><td>①</td><td>差异表定稿（相对 B1 + 相对官方 Mosaico）</td></tr>
+            <tr><td class="wk">M1</td><td>②</td><td>官方 build 命令无改源码通过</td></tr>
+            <tr><td class="wk">M2</td><td>③</td><td>触摸 + 基础 UI 可用</td></tr>
+            <tr><td class="wk">M3</td><td>⑤</td><td>自有板刷机说明可发货；固件 tag 对齐官方 board 名</td></tr>
+            <tr><td class="wk">—</td><td>④</td><td>相机/IMU 写入「完整版」不挡首发</td></tr>
+          </tbody>
+        </table></div>
+        <div class="tip"><strong>最小发货包：</strong>①②③⑤。买家文档以「刷 esp-mosaico」为主，维护成本跟随官方。</div>
+      </div>
+
+      <div class="curriculum-block l3" id="l3-curriculum">
+        <h3>L3 · C P4 七寸 MIPI 中枢 · <code>CX_P4_7in_Album_Hub</code> · <code>CX-P4-7</code></h3>
+        <p class="muted"><strong>前提：</strong>L0 会 <code>set-target esp32p4</code>；大屏与存储/音频硬件定型后与软件并行。</p>
+        <div class="chapter-grid" aria-label="五步流程">
+          <span class="chapter-pill" style="background:#1d3557">① MIPI 点亮<small>esp_lcd</small></span>
+          <span class="chapter-pill" style="background:#2563eb">② LVGL<small>esp_lvgl_port</small></span>
+          <span class="chapter-pill" style="background:#0891b2">③ 相册存储<small>fatfs/HTTP</small></span>
+          <span class="chapter-pill" style="background:#7c3aed">④ 小智板级<small>cx-p4-7</small></span>
+          <span class="chapter-pill" style="background:#059669">⑤ 中枢 MCP<small>home.*</small></span>
+        </div>
+        <div class="table-scroll table-scroll-curriculum"><table class="sprint sprint-curriculum sprint-steps">
+          <thead><tr><th class="wk">步</th><th>学什么</th><th class="col-doc">乐鑫主线</th><th class="col-pkg">教程包</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="wk">①</td>
+              <td>MIPI DSI 时序 · 背光/复位 · 触摸 I2C（并入已有 7 寸工程）</td>
+              <td class="col-doc"><a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32p4/index.html">ESP32-P4 文档</a> · esp_lcd MIPI 面板组件 · <a href="https://github.com/espressif/esp-dev-kits">esp-dev-kits</a> P4 参考</td>
+              <td><span class="tag t4">最小包</span></td>
+            </tr>
+            <tr>
+              <td class="wk">②</td>
+              <td>esp_lvgl_port 初始化 · demos（widgets/music）压测帧率与触摸</td>
+              <td class="col-doc"><a href="https://github.com/espressif/esp-bsp">esp-bsp</a> <code>esp_lvgl_port</code> · LVGL 官方 demo</td>
+              <td><span class="tag t4">最小包</span></td>
+            </tr>
+            <tr>
+              <td class="wk">③</td>
+              <td>SD/eMMC 或 SPI Flash 存图 · 局域网上传 · 屏上幻灯片</td>
+              <td class="col-doc"><code>peripherals/sdmmc</code> · <code>fatfs</code> · <code>protocols/http_server/file_serving</code> · esp_new_jpeg</td>
+              <td><span class="tag t4">最小包</span></td>
+            </tr>
+            <tr>
+              <td class="wk">④</td>
+              <td>xiaozhi 迁入 P4 大屏 UI · 音频通路 · OTA</td>
+              <td class="col-doc"><a href="https://github.com/78/xiaozhi-esp32">xiaozhi-esp32</a> · <a href="https://github.com/espressif/esp_codec_dev">esp_codec_dev</a> · <code>system/ota</code></td>
+              <td><span class="tag t4">最小包</span> 相册或小智二选一先发</td>
+            </tr>
+            <tr>
+              <td class="wk">⑤</td>
+              <td>可选：<a href="https://github.com/espressif/esp-brookesia">esp-brookesia</a> 整套 HMI · <code>home.*</code> MCP 转发外设节点</td>
+              <td class="col-doc"><a href="https://github.com/espressif/esp-brookesia">esp-brookesia</a> · idf <code>protocols/mqtt</code></td>
+              <td><span class="tag t-esp32">二期</span></td>
+            </tr>
+          </tbody>
+        </table></div>
+        <h3>里程碑（P4）</h3>
+        <div class="table-scroll"><table class="sprint">
+          <thead><tr><th class="wk">里程碑</th><th>对应步骤</th><th>过关</th></tr></thead>
+          <tbody>
+            <tr><td class="wk">M0</td><td>①</td><td>7 寸稳定亮屏 + 触摸坐标正确</td></tr>
+            <tr><td class="wk">M1</td><td>②</td><td>LVGL 交互流畅（记录分辨率与缓冲配置）</td></tr>
+            <tr><td class="wk">M2</td><td>③</td><td>相册闭环：上传 → 轮播</td></tr>
+            <tr><td class="wk">M3</td><td>④</td><td>小智对话或相册 UI 至少一项可演示发货</td></tr>
+            <tr><td class="wk">M4</td><td>⑤</td><td>语音控 1 路外设或 Brookesia 壳层（连载可标「开发中」）</td></tr>
+          </tbody>
+        </table></div>
+        <div class="tip"><strong>最小发货包：</strong>①②③ + ④ 相册<strong>或</strong>小智其一；⑤ 进教程「中枢进阶」。</div>
+      </div>
+
+      <div class="curriculum-block l4" id="l4-curriculum">
+        <h3>L4 · A ESP 外设节点 · <code>CX_Node_MQTT</code> · <code>CX-NODE</code></h3>
+        <p class="muted"><strong>前提：</strong>L1 或 L3 侧已有 MQTT Broker（小智/P4）；节点固件独立仓库 <code>cx-node-fw</code>，主题与中枢文档同一本。</p>
+        <div class="chapter-grid" aria-label="五步流程">
+          <span class="chapter-pill" style="background:#0077b6">① 继电器<small>gpio+mqtt</small></span>
+          <span class="chapter-pill" style="background:#0891b2">② 主题联调<small>MCP 设计</small></span>
+          <span class="chapter-pill" style="background:#059669">③ 采集<small>adc/i2c</small></span>
+          <span class="chapter-pill" style="background:#d97706">④ ESP8266<small>同协议</small></span>
+          <span class="chapter-pill" style="background:#334155">⑤ 垂直场景<small>模板 SKU</small></span>
+        </div>
+        <div class="table-scroll table-scroll-curriculum"><table class="sprint sprint-curriculum sprint-steps">
+          <thead><tr><th class="wk">步</th><th>学什么</th><th class="col-doc">乐鑫主线</th><th class="col-pkg">教程包</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="wk">①</td>
+              <td>GPIO 驱动继电器 · Wi-Fi STA · MQTT 订阅 JSON 命令 · 状态回 publish</td>
+              <td class="col-doc"><code>peripherals/gpio</code> · <a href="https://github.com/espressif/esp-mqtt">esp-mqtt</a> · <code>protocols/mqtt</code> · <code>wifi/getting_started</code></td>
+              <td><span class="tag t-esp32">最小包</span></td>
+            </tr>
+            <tr>
+              <td class="wk">②</td>
+              <td>定主题：<code>home.relay_*</code> / <code>cx/node/&lt;id&gt;/cmd</code> · P4/S31 MCP 转发约定</td>
+              <td class="col-doc">idf MQTT 例程 · xiaozhi MCP 文档（中枢侧）</td>
+              <td><span class="tag t-esp32">最小包</span></td>
+            </tr>
+            <tr>
+              <td class="wk">③</td>
+              <td>ADC 或 I2C 传感器读数 · 周期遥测 · 阈值告警（可选）</td>
+              <td class="col-doc"><code>peripherals/adc</code> · <code>peripherals/i2c</code> · <a href="https://github.com/espressif/esp-iot-solution">esp-iot-solution</a> 传感器章</td>
+              <td><span class="tag t-s3">拓展</span> 首发可先继电器 only</td>
+            </tr>
+            <tr>
+              <td class="wk">④</td>
+              <td>ESP8266 超低 BOM：同 JSON 主题 · 精简外设</td>
+              <td class="col-doc"><a href="https://github.com/espressif/ESP8266_RTOS_SDK">ESP8266_RTOS_SDK</a> MQTT 例程</td>
+              <td><span class="tag t-esp32">选配 SKU</span></td>
+            </tr>
+            <tr>
+              <td class="wk">⑤</td>
+              <td>垂直模板：盆栽湿度 / 鱼塘水质 / 果蔬温湿度 / 鱼缸溶氧 选一写满 buyer 文档</td>
+              <td class="col-doc">iot-solution 对应驱动 · 与 L3 相册/小智无关联亦可</td>
+              <td><span class="tag t-s3">场景包</span></td>
+            </tr>
+          </tbody>
+        </table></div>
+        <h3>里程碑（节点）</h3>
+        <div class="table-scroll"><table class="sprint">
+          <thead><tr><th class="wk">里程碑</th><th>对应步骤</th><th>过关</th></tr></thead>
+          <tbody>
+            <tr><td class="wk">M0</td><td>①</td><td>中枢 MQTT 控一路继电器</td></tr>
+            <tr><td class="wk">M1</td><td>②</td><td>语音或 UI 发令 → 节点执行有日志</td></tr>
+            <tr><td class="wk">M2</td><td>③</td><td>至少 1 路 float 遥测稳定上报</td></tr>
+            <tr><td class="wk">M3</td><td>⑤</td><td>1 个场景模板可售（BOM + 刷机 + 主题表）</td></tr>
+          </tbody>
+        </table></div>
+        <div class="tip"><strong>最小发货包：</strong>①②（继电器节点）；采集与 8266 作同系列续章。</div>
+      </div>
+
+      <div class="curriculum-block l5" id="l5-curriculum">
+        <h3>L5 · D S3 互动（5a 机器狗 · 5b 桌面摆件 · 5c 多功能小车）</h3>
+        <p class="muted"><strong>前提：</strong>L0 <code>set-target esp32s3</code>；三路可并行，共用可选 <code>robot/cmd</code> MQTT（与 L4 规范一致）。</p>
+        <div class="chapter-grid" aria-label="5a 四步">
+          <span class="chapter-pill" style="background:#2d6a4f">5a·① 环境<small>S3+舵机</small></span>
+          <span class="chapter-pill" style="background:#40916c">5a·② 单舵机<small>LEDC/MCPWM</small></span>
+          <span class="chapter-pill" style="background:#52b788">5a·③ 步态<small>多舵机</small></span>
+          <span class="chapter-pill" style="background:#1b4332">5a·④ 联调<small>MQTT</small></span>
+        </div>
+        <div class="table-scroll table-scroll-curriculum"><table class="sprint sprint-curriculum sprint-steps" id="l5a-curriculum">
+          <thead><tr><th class="wk">5a</th><th>学什么 · <code>CX_S3_Robot_Dog</code></th><th class="col-doc">乐鑫主线</th><th>教程包</th></tr></thead>
+          <tbody>
+            <tr><td class="wk">①</td><td>环境与供电：S3 烧录 · 舵机电源隔离 · 机械组装（Freenove 类说明）</td><td class="col-doc"><code>get-started/hello_world</code> · <a href="https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32s3/index.html">ESP32-S3 文档</a></td><td><span class="tag t2">最小包</span></td></tr>
+            <tr><td class="wk">②</td><td>单舵机角度 · 零位校准 · 限位</td><td class="col-doc"><code>peripherals/ledc</code> · <code>peripherals/mcpwm</code></td><td><span class="tag t2">最小包</span></td></tr>
+            <tr><td class="wk">③</td><td>多舵机协调 · 站起/走一步 · 动作序列表</td><td class="col-doc">LEDC/MCPWM 进阶 · 定时器/任务编排</td><td><span class="tag t2">最小包</span></td></tr>
+            <tr><td class="wk">④</td><td>可选：<code>robot/cmd</code> JSON · 中枢语音触发 1 动作</td><td class="col-doc">esp-mqtt · 与 <a href="#l4-curriculum">L4 主题</a> 对齐</td><td><span class="tag t-s3">选配</span></td></tr>
+          </tbody>
+        </table></div>
+        <div class="chapter-grid" aria-label="5b 四步">
+          <span class="chapter-pill" style="background:#0891b2">5b·① 条形屏<small>bsp</small></span>
+          <span class="chapter-pill" style="background:#06b6d4">5b·② 表情<small>emote_gfx</small></span>
+          <span class="chapter-pill" style="background:#0e7490">5b·③ 内容<small>轮播/时钟</small></span>
+          <span class="chapter-pill" style="background:#164e63">5b·④ 联动<small>可选</small></span>
+        </div>
+        <div class="table-scroll table-scroll-curriculum"><table class="sprint sprint-curriculum sprint-steps" id="l5b-curriculum">
+          <thead><tr><th class="wk">5b</th><th>学什么 · <code>CX_Desk_Ornament</code></th><th class="col-doc">乐鑫主线</th><th>教程包</th></tr></thead>
+          <tbody>
+            <tr><td class="wk">①</td><td>条形 LCD/QSPI 点亮 · 亮度与结构件</td><td class="col-doc"><a href="https://github.com/espressif/esp-bsp">esp-bsp</a> 条形屏板型 · <code>peripherals/lcd</code></td><td><span class="tag t2">最小包</span></td></tr>
+            <tr><td class="wk">②</td><td>esp_emote_gfx 表情或矢量动画</td><td class="col-doc"><a href="https://github.com/espressif2022/esp_emote_gfx">esp_emote_gfx</a></td><td><span class="tag t2">最小包</span></td></tr>
+            <tr><td class="wk">③</td><td>轮播图/时钟挂件/待机表盘（LVGL 或 gfx 二选一主路径）</td><td class="col-doc"><code>esp_lvgl_port</code> · SNTP</td><td><span class="tag t2">最小包</span></td></tr>
+            <tr><td class="wk">④</td><td>可选：MQTT 换表情 · 与小智/节点事件联动</td><td class="col-doc"><code>protocols/mqtt</code></td><td><span class="tag t-s3">选配</span></td></tr>
+          </tbody>
+        </table></div>
+        <div class="chapter-grid" aria-label="5c 四步">
+          <span class="chapter-pill" style="background:#e85d04">5c·① 电机<small>mcpwm</small></span>
+          <span class="chapter-pill" style="background:#f48c06">5c·② 运动<small>转向</small></span>
+          <span class="chapter-pill" style="background:#faa307">5c·③ 功能<small>循迹/避障</small></span>
+          <span class="chapter-pill" style="background:#dc2f02">5c·④ 遥控<small>MQTT/BT</small></span>
+        </div>
+        <div class="table-scroll table-scroll-curriculum"><table class="sprint sprint-curriculum sprint-steps" id="l5c-curriculum">
+          <thead><tr><th class="wk">5c</th><th>学什么 · <code>CX_S3_Multi_Car</code></th><th class="col-doc">乐鑫主线</th><th>教程包</th></tr></thead>
+          <tbody>
+            <tr><td class="wk">①</td><td>双电机驱动 · 电源与 PCB 布局 · 编码器可选</td><td class="col-doc"><code>peripherals/mcpwm</code> · <code>peripherals/pcnt</code></td><td><span class="tag t2">最小包</span></td></tr>
+            <tr><td class="wk">②</td><td>前进/后退/差速转向 · 速度闭环（若有编码器）</td><td class="col-doc">MCPWM 互补输出 · 定时采样</td><td><span class="tag t2">最小包</span></td></tr>
+            <tr><td class="wk">③</td><td>循迹或超声波避障或线追踪 <strong>三选一</strong> 作「多功能」卖点</td><td class="col-doc"><code>peripherals/adc</code> · <code>i2c</code> · 超声波/I2C 驱动（iot-solution）</td><td><span class="tag t2">最小包</span></td></tr>
+            <tr><td class="wk">④</td><td>手机蓝牙/gamepad 或 MQTT <code>robot/cmd</code> 遥控</td><td class="col-doc"><code>bluetooth/ble</code> 或 esp-mqtt</td><td><span class="tag t-s3">选配</span></td></tr>
+          </tbody>
+        </table></div>
+        <h3>里程碑（5a / 5b / 5c）</h3>
+        <div class="table-scroll"><table class="sprint">
+          <thead><tr><th class="wk">子项</th><th>过关</th></tr></thead>
+          <tbody>
+            <tr><td class="wk">5a</td><td>完成 ③：1 个稳定动作可拍演示视频；④ 可连载</td></tr>
+            <tr><td class="wk">5b</td><td>完成 ③：展台可循环 demo；结构件与供电安全写在首章</td></tr>
+            <tr><td class="wk">5c</td><td>完成 ②+③：运动 + 1 项多功能；与 5a 并列写 <code>robot/cmd</code> 字段说明</td></tr>
+          </tbody>
+        </table></div>
+        <div class="tip"><strong>发货策略：</strong>5a/b/c 各一本教程产品 ID，勿共用一块板 SKU；L5 不挡 L1～L4 主线，可并行打样。</div>
+      </div>
+    </section>
+
+    <section class="card" id="cx-docs">
+      <h2>教程站同步：<a href="https://github.com/Zhentao-Lin/CX_Product_Tutorials">CX_Product_Tutorials</a></h2>
+      <p class="muted">Sphinx + GitHub Pages；<strong>每完成一个产品阶段（硬件过关 + 固件可演示）</strong>，即在教程仓跟进一章产品文档。push <code>main</code> 后 Actions 自动 <code>cx_docs.py sync</code> 并发布（见仓库 <code>docs/content-workflow.md</code>）。</p>
+      <p class="muted">在线阅读：<a href="https://zhentao-lin.github.io/CX_Product_Tutorials/">zhentao-lin.github.io/CX_Product_Tutorials</a></p>
+      <div class="table-scroll"><table class="sprint">
+        <thead><tr><th class="wk">研发</th><th>建议 <code>products.yml</code> 产品 ID</th><th>何时同步</th><th>首版应包含</th></tr></thead>
+        <tbody>
+          <tr>
+            <td class="wk">L1 B1</td>
+            <td><code>CX_S31_Mini_Xiaozhi</code></td>
+            <td>v1.1 打样过关、发货固件 tag 打好</td>
+            <td>按 <a href="#s31-curriculum">48 节</a>最小包 M0～M5 写章；首版至少 01～10、14～18、23～27、46～47</td>
+          </tr>
+          <tr>
+            <td class="wk">L2 B2</td>
+            <td><code>CX_S31_Mosaico_Compat</code></td>
+            <td>兼容板可刷官方 <code>esp-mosaico</code></td>
+            <td>按 <a href="#l2-curriculum">L2 五步</a> M0～M3：差异表 · 刷 esp-mosaico · 触摸课；④ 标拓展</td>
+          </tr>
+          <tr>
+            <td class="wk">L3 C</td>
+            <td><code>CX_P4_7in_Album_Hub</code></td>
+            <td>7 寸 LVGL + 相册或小智至少一项稳定</td>
+            <td>按 <a href="#l3-curriculum">L3 五步</a> M0～M3 首版；⑤ Brookesia/MCP 标连载</td>
+          </tr>
+          <tr>
+            <td class="wk">L4 A</td>
+            <td><code>CX_Node_MQTT</code></td>
+            <td>继电器节点 + 中枢联调通过</td>
+            <td>按 <a href="#l4-curriculum">L4 五步</a> M0～M1 首发；M2/M3 采集与场景模板</td>
+          </tr>
+          <tr>
+            <td class="wk">L5a</td>
+            <td><code>CX_S3_Robot_Dog</code></td>
+            <td>机器狗能站起/走两步或完成 1 个动作指令</td>
+            <td>按 <a href="#l5a-curriculum">5a 四步</a> ①～③；④ 可选</td>
+          </tr>
+          <tr>
+            <td class="wk">L5b</td>
+            <td><code>CX_Desk_Ornament</code></td>
+            <td>摆件 demo 可展示</td>
+            <td>按 <a href="#l5b-curriculum">5b 四步</a> ①～③ 首版</td>
+          </tr>
+          <tr>
+            <td class="wk">L5c</td>
+            <td><code>CX_S3_Multi_Car</code></td>
+            <td>小车可前进/转向 + 至少 1 项「多功能」（循迹/避障/遥控选一）</td>
+            <td>按 <a href="#l5c-curriculum">5c 四步</a> ①～③；<code>robot/cmd</code> 与 5a 同页</td>
+          </tr>
+        </tbody>
+      </table></div>
+      <h3>每次同步（约 30 分钟）</h3>
+      <ol class="learn-step">
+        <li>在仓库 <code>docs/source/products/&lt;产品ID&gt;/</code> 新增或修改 <code>NN-主题.md</code>（章节自动排序，无需改 index）。</li>
+        <li>资源图放到同产品 <code>assets/images/</code>；写法见仓库 <code>docs/assets-guide.md</code>。</li>
+        <li>新产品：先改 <code>catalog/products.yml</code>，或执行 <code>python tools/cx_docs.py new-product --id … --title …</code>。</li>
+        <li>文首写清 <strong>适用 PCB REV</strong>、<strong>IDF/xiaozhi 提交或 tag</strong>，与 S31-Sketches 里固件一致。</li>
+        <li><code>git push origin main</code> → 等 Pages 绿勾 → 二维码/说明书链接换成 Pages URL。</li>
+      </ol>
+      <div class="tip"><strong>与路线图联动：</strong>本页验收清单里「教学站」项勾上 = 对应产品在 CX_Product_Tutorials 至少有 <code>01-overview.md</code> + 入门烧录章。仓库里旧的 S3 产品条目可保留或改 ID，但<strong>各 SKU 独立产品 ID</strong>（含狗、小车、摆件），避免买家混板。</div>
+    </section>
+
+    <section class="card" id="loop">
+      <h2>边做板边学：闭环不变</h2>
+      <svg class="loop-svg" viewBox="0 0 800 120" aria-label="学习闭环">
+        <rect x="10" y="35" width="115" height="50" rx="8" fill="#f0e3ff" stroke="#9d4edd"/>
+        <text x="67" y="58" text-anchor="middle" font-size="10" font-weight="bold">① 画原理图</text>
+        <text x="67" y="74" text-anchor="middle" font-size="8" fill="#5c6478">只加本周一项</text>
+        <polygon points="130,60 155,60" fill="#5c6478"/><polygon points="155,60 148,56 148,64"/>
+        <rect x="160" y="35" width="115" height="50" rx="8" fill="#e8f4fc" stroke="#0077b6"/>
+        <text x="217" y="58" text-anchor="middle" font-size="10" font-weight="bold">② 样机写码</text>
+        <text x="217" y="74" text-anchor="middle" font-size="8" fill="#5c6478">IDF / xiaozhi</text>
+        <polygon points="280,60 305,60" fill="#5c6478"/><polygon points="305,60 298,56 298,64"/>
+        <rect x="310" y="35" width="115" height="50" rx="8" fill="#d8f3dc" stroke="#2d6a4f"/>
+        <text x="367" y="58" text-anchor="middle" font-size="10" font-weight="bold">③ 功能过关</text>
+        <text x="367" y="74" text-anchor="middle" font-size="8" fill="#5c6478">示波器/串口</text>
+        <polygon points="430,60 455,60" fill="#5c6478"/><polygon points="455,60 448,56 448,64"/>
+        <rect x="460" y="35" width="115" height="50" rx="8" fill="#fff8f3" stroke="#e85d04"/>
+        <text x="517" y="58" text-anchor="middle" font-size="10" font-weight="bold">④ PCB 打样</text>
+        <text x="517" y="74" text-anchor="middle" font-size="8" fill="#5c6478">改 netlist</text>
+        <polygon points="580,60 605,60" fill="#5c6478"/><polygon points="605,60 598,56 598,64"/>
+        <rect x="610" y="35" width="115" height="50" rx="8" fill="#f3f6fb" stroke="#1d3557"/>
+        <text x="667" y="58" text-anchor="middle" font-size="10" font-weight="bold">⑤ 自有板复测</text>
+        <text x="667" y="74" text-anchor="middle" font-size="8" fill="#5c6478">同一段代码</text>
+        <path d="M667 88 Q400 108 67 88" fill="none" stroke="#5c6478" stroke-dasharray="4 3"/>
+        <text x="400" y="112" text-anchor="middle" font-size="9" fill="#5c6478">过关后 ⑥ 同步 CX_Product_Tutorials，再发卡/发货</text>
+      </svg>
+      <p class="muted">⑥ 文档：<a href="#cx-docs">教程站</a> push 即发布。画板对照 <a href="https://github.com/espressif/esp-hardware-design-guidelines">硬件设计指南</a>；代码 xiaozhi board / <code>cx-node-fw</code>。</p>
+    </section>
+
+    <section class="card" id="stages">
+      <h2>阶段课表（官方示例 → 你的产品）</h2>
+      <p class="muted">循序渐进全文：<a href="#s31-curriculum">L1·48 节</a> · <a href="#product-curricula">L2～L5 课纲</a>。本区为<strong>速查版</strong>（先跑官方例程 → 迁入 SKU）。L5 内 <strong>5a/5b/5c</strong> 可并行。</p>
+
+      <div class="phase-block" style="border-color:#5c6478">
+        <h3>L0 · 共用底座（约 3～5 天）</h3>
+        <ol class="learn-step">
+          <li>安装 ESP-IDF（S31/P4 目标），跑通 <code>examples/get-started/hello_world</code>、<code>idf.py menuconfig</code> / monitor。</li>
+          <li>读 <a href="https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32s31/index.html">ESP32-S31 编程指南</a> 与 <a href="https://github.com/espressif/esp-dev-kits">esp-dev-kits</a> 中 S31 官方板原理图（声学/电源参考）。</li>
+          <li>建立 KiCad 工程：符号/封装用 <a href="https://github.com/espressif/kicad-libraries">kicad-libraries</a>；高速/音频规则查硬件设计指南。</li>
+        </ol>
+        <p class="muted"><strong>产出：</strong>统一 IDF 版本说明、引脚表 v1、双 S31 SKU 命名规则。</p>
+      </div>
+
+      <div class="phase-block" style="border-color:#c77dff">
+        <h3>L1 · B1 S31 最小系统（见 <a href="#s31-curriculum">48 节纲</a>）</h3>
+        <p class="muted">边做 v1.1 板边按节推进；课表与 <a href="../CX-ESP32-S31_循序渐进教程.html">循序渐进 HTML</a> 一一对应，写成熟的章节 push 到 <code>CX_S31_Mini_Xiaozhi</code>。</p>
+        <div class="table-scroll"><table class="sprint">
+          <thead><tr><th class="wk">里程碑</th><th>教程篇·节</th><th class="col-fw">与硬件并行</th></tr></thead>
+          <tbody>
+            <tr><td class="wk">M0</td><td>① 01～05</td><td class="col-fw">环境就绪；对照官方 S31 板画 v1.1</td></tr>
+            <tr><td class="wk">M1</td><td>② 07～10</td><td class="col-fw">WS2812/按键 → 声学区走线评审</td></tr>
+            <tr><td class="wk">M2</td><td>③ 14～18</td><td class="col-fw">ES8311/麦/TF 打样验证</td></tr>
+            <tr><td class="wk">M3</td><td>⑤ 23～27 + OTA</td><td class="col-fw">v1.1 焊测 · MQTT/OTA 可发货</td></tr>
+            <tr><td class="wk">M4</td><td>⑧ 46～47</td><td class="col-fw">xiaozhi + MCP 演示固件</td></tr>
+            <tr><td class="wk">—</td><td>④⑥⑦ 选修</td><td class="col-fw">摄像头/蓝牙/扩展板 LVGL 进「完整版」不挡首发</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="phase-block" style="border-color:#9d4edd">
+        <h3>L2 · B2 Mosaico 兼容（薄维护走量）</h3>
+        <div class="table-scroll"><table class="sprint">
+          <thead><tr><th class="wk">序</th><th class="col-doc">官方先跑什么</th><th class="col-code">迁入你的板</th><th class="col-fw">阶段过关</th></tr></thead>
+          <tbody>
+            <tr><td class="wk">1</td><td class="col-doc"><a href="https://mosaico.espressif.com">Mosaico 文档</a> · xiaozhi <code>python3 scripts/build.py espressif/esp-mosaico</code></td><td class="col-code">用官方逻辑；记录与自有最小系统的 BOM 差异</td><td class="col-fw">官方构建命令通过</td></tr>
+            <tr><td class="wk">2</td><td class="col-doc"><a href="https://github.com/espressif/esp-bsp">esp-bsp</a> QSPI LCD + 触摸；<code>peripherals/lcd</code></td><td class="col-code">480 方屏/触摸与官方引脚一致则零改板级</td><td class="col-fw">触控 + UI 可用</td></tr>
+            <tr><td class="wk">3</td><td class="col-doc">可选：<code>esp32-camera</code> / 扩展座 IMU（bsp、iot-solution）</td><td class="col-code">摄像头子板说明写入买家文档（冷插拔限制）</td><td class="col-fw">砍掉的功能在差异表列出</td></tr>
+            <tr><td class="wk">4</td><td class="col-doc">廉价 PCB：仅保证与官方 <code>config.h</code> 引脚一致</td><td class="col-code">自有 <code>boards/cx-s31-mosa</code> 仅当引脚不同</td><td class="col-fw">刷机说明 =「选 esp-mosaico」</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="phase-block" style="border-color:#1d3557">
+        <h3>L3 · C P4 七寸（LVGL 学习 → 相册小智中枢）</h3>
+        <div class="table-scroll"><table class="sprint">
+          <thead><tr><th class="wk">序</th><th class="col-doc">官方先跑什么</th><th class="col-code">迁入你的板</th><th class="col-fw">阶段过关</th></tr></thead>
+          <tbody>
+            <tr><td class="wk">1</td><td class="col-doc">IDF <code>set-target esp32p4</code>；MIPI DSI 例程 / esp_lcd 面板组件</td><td class="col-code">复盘你已有 7 寸点亮工程，合并到主分支</td><td class="col-fw">稳定亮屏</td></tr>
+            <tr><td class="wk">2</td><td class="col-doc">esp-bsp <strong>esp_lvgl_port</strong> · LVGL demos（widgets/music）</td><td class="col-code">教程式：先做相册轮播 widget，再接小智 UI</td><td class="col-fw">LVGL 帧率/触摸 OK</td></tr>
+            <tr><td class="wk">3</td><td class="col-doc"><code>protocols/http_server/file_serving</code> · <code>fatfs</code> / SD 例程</td><td class="col-code">局域网上传图片 → 屏上幻灯片</td><td class="col-fw">相册闭环</td></tr>
+            <tr><td class="wk">4</td><td class="col-doc"><a href="https://github.com/espressif/esp-brookesia">esp-brookesia</a>（可选整套 HMI）或继续 LVGL 自研</td><td class="col-code"><code>boards/cx-p4-7</code> + xiaozhi；<code>home.*</code> MCP 二期</td><td class="col-fw">对话/音乐/相册至少两项</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="phase-block">
+        <h3>L4 · A ESP 外设节点（继电器 → 采集）</h3>
+        <div class="table-scroll"><table class="sprint">
+          <thead><tr><th class="wk">序</th><th class="col-doc">官方先跑什么</th><th class="col-code">迁入你的板</th><th class="col-fw">阶段过关</th></tr></thead>
+          <tbody>
+            <tr><td class="wk">1</td><td class="col-doc"><code>peripherals/gpio</code>（继电器）· <a href="https://github.com/espressif/esp-mqtt">esp-mqtt</a></td><td class="col-code"><code>cx-node-fw</code>：JSON 命令订阅/执行</td><td class="col-fw">中枢 MQTT 控一路</td></tr>
+            <tr><td class="wk">2</td><td class="col-doc">P4/S31 侧：<code>protocols/mqtt</code> + xiaozhi MCP 转发设计</td><td class="col-code"><code>home.relay_*</code> 或主题规范文档</td><td class="col-fw">语音控继电器</td></tr>
+            <tr><td class="wk">3</td><td class="col-doc"><code>peripherals/adc</code> · <code>i2c</code> · iot-solution 传感器驱动</td><td class="col-code">选 1 个垂直场景（盆栽/鱼塘/果蔬/鱼缸）</td><td class="col-fw">1 个 float 遥测上云/局域网</td></tr>
+            <tr><td class="wk">4</td><td class="col-doc">ESP8266：<a href="https://github.com/espressif/ESP8266_RTOS_SDK">ESP8266_RTOS_SDK</a> 同主题 MQTT</td><td class="col-code">超低 BOM 节点 SKU</td><td class="col-fw">与 ESP32 节点协议一致</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+
+      <div class="phase-block" style="border-color:#2d6a4f">
+        <h3>L5 · D 互动类：5a 机器狗 / 5b 桌面摆件 / 5c 多功能小车</h3>
+        <div class="table-scroll"><table class="sprint">
+          <thead><tr><th class="wk">子项</th><th class="col-doc">官方先跑什么</th><th class="col-code">迁入你的板</th><th class="col-fw">过关</th></tr></thead>
+          <tbody>
+            <tr><td class="wk">5a</td><td class="col-doc">IDF <code>esp32s3</code> · <code>peripherals/mcpwm</code> / LEDC 舵机</td><td class="col-code">Freenove 狗：单舵机 → 步态；<code>robot/cmd</code> MQTT</td><td class="col-fw">1 个稳定动作</td></tr>
+            <tr><td class="wk">5b</td><td class="col-doc"><a href="https://github.com/espressif2022/esp_emote_gfx">esp_emote_gfx</a> · esp-bsp 条形 LCD</td><td class="col-code">摆件：表情 / 轮播 / 时钟挂件</td><td class="col-fw">可展示 demo</td></tr>
+            <tr><td class="wk">5c</td><td class="col-doc"><code>mcpwm</code> 电机 · <code>adc</code>/<code>i2c</code> 传感器 · MQTT / 蓝牙遥控</td><td class="col-code">双电机转向；循迹/避障/遥控 选 1；共用 <code>robot/*</code></td><td class="col-fw">运动 + 1 多功能</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <section class="card" id="labs">
+      <h2>官方示例速查（按学习阶段）</h2>
+      <p class="muted">路径均相对于克隆的 <a href="https://github.com/espressif/esp-idf">esp-idf</a> 仓库根目录 <code>examples/</code>，除非另给 GitHub 链接。</p>
+      <div class="table-scroll"><table class="sprint">
+        <thead><tr><th>阶段</th><th>能力</th><th class="col-doc">官方入口</th><th>你的 SKU</th></tr></thead>
+        <tbody>
+          <tr><td>L0</td><td>入门</td><td class="col-doc"><code>get-started/hello_world</code> · <code>get-started/blink</code></td><td>环境文档进教学站第 1 课</td></tr>
+          <tr><td>L1</td><td>篇①②</td><td class="col-doc"><code>hello_world</code> · gpio/ledc/led_strip</td><td><a href="#s31-curriculum">节 01～13</a></td></tr>
+          <tr><td>L1</td><td>篇③⑤</td><td class="col-doc">i2s · sdmmc/fatfs · wifi · mqtt · ota</td><td>节 14～18、23～27</td></tr>
+          <tr><td>L1</td><td>篇④⑥⑦</td><td class="col-doc">esp32-camera · bluetooth · esp_lvgl_port</td><td>拓展 / 扩展板包</td></tr>
+          <tr><td>L1</td><td>篇⑧</td><td class="col-doc"><a href="https://github.com/espressif/esp-sr">esp-sr</a> · xiaozhi</td><td>节 45～48（发货 46～47）</td></tr>
+          <tr><td>L2</td><td>Mosaico 全套</td><td class="col-doc"><a href="https://mosaico.espressif.com">mosaico.espressif.com</a> · xiaozhi esp-mosaico</td><td><a href="#l2-curriculum">步 ②③</a></td></tr>
+          <tr><td>L2</td><td>方屏 / 触摸 / 相机</td><td class="col-doc"><a href="https://github.com/espressif/esp-bsp">esp-bsp</a> · esp32-camera · <code>peripherals/lcd</code></td><td><a href="#l2-curriculum">步 ③④</a></td></tr>
+          <tr><td>L3</td><td>P4 显示</td><td class="col-doc">esp_lcd MIPI 组件 · esp-bsp esp_lvgl_port</td><td><a href="#l3-curriculum">步 ①②</a></td></tr>
+          <tr><td>L3</td><td>相册 / HTTP</td><td class="col-doc"><code>protocols/http_server/file_serving</code> · esp_new_jpeg</td><td><a href="#l3-curriculum">步 ③</a></td></tr>
+          <tr><td>L3</td><td>HMI 框架</td><td class="col-doc"><a href="https://github.com/espressif/esp-brookesia">esp-brookesia</a></td><td><a href="#l3-curriculum">步 ⑤</a></td></tr>
+          <tr><td>L4</td><td>外设协议</td><td class="col-doc"><a href="https://github.com/espressif/esp-mqtt">esp-mqtt</a> · <code>peripherals/adc</code> · <code>peripherals/i2c</code></td><td><a href="#l4-curriculum">步 ①②</a></td></tr>
+          <tr><td>L4</td><td>传感器栈</td><td class="col-doc"><a href="https://github.com/espressif/esp-iot-solution">esp-iot-solution</a> 传感器章节</td><td><a href="#l4-curriculum">步 ③⑤</a></td></tr>
+          <tr><td>L5a</td><td>S3 舵机</td><td class="col-doc"><code>peripherals/mcpwm</code> · <code>peripherals/ledc</code></td><td><a href="#l5a-curriculum">5a ②③</a></td></tr>
+          <tr><td>L5b</td><td>摆件 UI</td><td class="col-doc"><a href="https://github.com/espressif2022/esp_emote_gfx">esp_emote_gfx</a> · esp-bsp 条形屏</td><td><a href="#l5b-curriculum">5b ①②</a></td></tr>
+          <tr><td>L5c</td><td>小车</td><td class="col-doc"><code>peripherals/mcpwm</code> · <code>pcnt</code> · <code>adc</code> · MQTT / 蓝牙</td><td><a href="#l5c-curriculum">5c ①③</a></td></tr>
+          <tr><td>∞</td><td>量产</td><td class="col-doc"><a href="https://github.com/espressif/esp-jumpstart">esp-jumpstart</a> · <code>security/secure_boot</code></td><td>规模出货前</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section class="card" id="check">
+      <h2>验收清单（本机勾选）</h2>
+      <ul class="checklist" id="progress-list">
+        <li><input type="checkbox" id="p-b1"/><label for="p-b1"><strong>B1</strong> S31 最小系统 v1.1 打样过关：对话 + MCP + 发货固件</label></li>
+        <li><input type="checkbox" id="p-b2"/><label for="p-b2"><strong>B1</strong> <a href="https://github.com/Zhentao-Lin/CX_Product_Tutorials">CX_Product_Tutorials</a>：<code>CX_S31_Mini_Xiaozhi</code> 已 push 且 Pages 可访问</label></li>
+        <li><input type="checkbox" id="p-b3"/><label for="p-b3"><strong>B2</strong> Mosaico 兼容板：官方 board 刷机即用</label></li>
+        <li><input type="checkbox" id="p-b4"/><label for="p-b4"><strong>B2</strong> 教程产品 <code>CX_S31_Mosaico_Compat</code> 含官方差异表</label></li>
+        <li><input type="checkbox" id="p-c1"/><label for="p-c1"><strong>C</strong> P4 七寸：LVGL + xiaozhi 同板稳定</label></li>
+        <li><input type="checkbox" id="p-c2"/><label for="p-c2"><strong>C</strong> 教程 <code>CX_P4_7in_Album_Hub</code> 与相册/小智功能同步</label></li>
+        <li><input type="checkbox" id="p-a1"/><label for="p-a1"><strong>A</strong> 继电器外设经 MCP/MQTT 被 P4 或 S31 控</label></li>
+        <li><input type="checkbox" id="p-a2"/><label for="p-a2"><strong>A</strong> 教程 <code>CX_Node_MQTT</code> 含主题规范 + 1 种采集</label></li>
+        <li><input type="checkbox" id="p-d1"/><label for="p-d1"><strong>5a</strong> 教程 <code>CX_S3_Robot_Dog</code>：机器狗动作 + MQTT 至少一项</label></li>
+        <li><input type="checkbox" id="p-d2"/><label for="p-d2"><strong>5b</strong> 教程 <code>CX_Desk_Ornament</code>：桌面摆件 demo 可展示</label></li>
+        <li><input type="checkbox" id="p-d3"/><label for="p-d3"><strong>5c</strong> 教程 <code>CX_S3_Multi_Car</code>：小车运动 + 1 项多功能 + MQTT/遥控</label></li>
+      </ul>
+    </section>
+
+    <section class="card links" id="links">
+      <h2>官方仓库索引</h2>
+      <div class="link-grid">
+        <div>
+          <h3>SDK 与文档</h3>
+          <ul>
+            <li><a href="https://github.com/espressif/esp-idf">esp-idf</a> · <a href="https://docs.espressif.com/projects/esp-idf/zh_CN/latest/esp32s31/index.html">S31 文档</a> · <a href="https://docs.espressif.com/projects/esp-idf/en/latest/esp32p4/index.html">P4 文档</a></li>
+            <li><a href="https://github.com/espressif/ESP8266_RTOS_SDK">ESP8266_RTOS_SDK</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>硬件 / 板卡</h3>
+          <ul>
+            <li><a href="https://github.com/espressif/esp-dev-kits">esp-dev-kits</a> · <a href="https://github.com/espressif/esp-hardware-design-guidelines">设计指南</a></li>
+            <li><a href="https://github.com/espressif/kicad-libraries">kicad-libraries</a> · <a href="https://github.com/espressif/esp-jumpstart">esp-jumpstart</a></li>
+            <li><a href="https://mosaico.espressif.com">ESP-Mosaico</a> · <a href="https://github.com/espressif/esp-board-manager">esp-board-manager</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>音视频 / UI</h3>
+          <ul>
+            <li><a href="https://github.com/espressif/esp-sr">esp-sr</a> · <a href="https://components.espressif.com/components/espressif/esp_codec_dev">esp_codec_dev</a></li>
+            <li><a href="https://github.com/espressif/esp-bsp">esp-bsp</a> · <a href="https://github.com/espressif/esp-brookesia">esp-brookesia</a></li>
+          </ul>
+        </div>
+        <div>
+          <h3>多媒体 / 协议</h3>
+          <ul>
+            <li><a href="https://github.com/espressif/esp-iot-solution">esp-iot-solution</a> · <a href="https://components.espressif.com/components/espressif/esp32-camera">esp32-camera</a></li>
+            <li><a href="https://github.com/espressif/esp-mqtt">esp-mqtt</a> · <a href="https://github.com/espressif/esp-protocols">esp-protocols</a></li>
+          </ul>
+        </div>
+        <div style="grid-column: span 2">
+          <h3>你的产品与社区固件</h3>
+          <ul>
+            <li><a href="https://github.com/Zhentao-Lin/CX_Product_Tutorials">CX_Product_Tutorials</a> · <a href="https://zhentao-lin.github.io/CX_Product_Tutorials/">Pages</a> · <a href="../CX-ESP32-S31_循序渐进教程.html">S31 教程大纲</a></li>
+            <li><a href="https://github.com/78/xiaozhi-esp32">xiaozhi-esp32</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer>docs/espressif-learning-roadmap.html（产品架构 + 学习路线合一）</footer>
+  <script>
+    (function () {
+      var KEY = "esp-roadmap-checks-v7";
+      document.querySelectorAll(".checklist input").forEach(function (el) {
+        var saved = {};
+        try { saved = JSON.parse(localStorage.getItem(KEY) || "{}"); } catch (e) {}
+        if (saved[el.id]) el.checked = true;
+        el.addEventListener("change", function () {
+          saved[el.id] = el.checked;
+          localStorage.setItem(KEY, JSON.stringify(saved));
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
