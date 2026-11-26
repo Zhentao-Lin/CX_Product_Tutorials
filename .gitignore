@@ -1,8 +1,13 @@
-03-网站系统-勿动/_build/
-03-网站系统-勿动/sphinx-source/products
-03-网站系统-勿动/sphinx-source/index.md
-02-可编辑内容/products/**/index.md
+# Sphinx local build output
+**/_build/
+
+# Generated / linked during sync (CI recreates)
+**/sphinx-source/products
+**/sphinx-source/index.md
+**/products/*/index.md
+
 __pycache__/
+**/__pycache__/
 .venv/
 venv/
 *.pyc
@@ -10,5 +15,4 @@ venv/
 Thumbs.db
 _site/
 .bundle/
-*.freenove.html
-**/__pycache__/
+*.chaoxi.html

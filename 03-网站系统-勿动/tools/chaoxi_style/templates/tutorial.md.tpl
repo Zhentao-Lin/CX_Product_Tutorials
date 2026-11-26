@@ -4,7 +4,7 @@
 
 1. 接线前拔掉 USB，确认正负极后再供电。
 2. （产品相关安全提示）
-3. 官网与资料：https://www.freenove.com
+3. 官网与资料：https://zhentao-lin.github.io/CX_Product_Tutorials/
 
 ---
 

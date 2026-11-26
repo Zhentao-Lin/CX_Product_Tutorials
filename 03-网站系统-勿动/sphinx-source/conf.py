@@ -1,10 +1,12 @@
 from datetime import datetime
 import os
 
-project = "CX_Product_Tutorials"
+project = "CX 硬件产品教程"
 copyright = f"{datetime.now():%Y}, CX"
 author = "CX"
-release = "v0.1.0"
+release = "v0.2.0"
+html_title = "CX 硬件产品教程"
+html_short_title = "CX Tutorials"
 
 extensions = [
     "myst_parser",

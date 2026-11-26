@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Convert Freenove tutorial Markdown → HTML (Style Guide §13).
+Convert ChaoXi tutorial Markdown → HTML (Style Guide §13).
 Usage:
   python md_to_html.py <input.md> [-o out.html] [--title TITLE] [--inline-css]
 """
@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-CSS_FILE = ROOT / "assets" / "freenove-tutorial.css"
+CSS_FILE = ROOT / "assets" / "chaoxi-tutorial.css"
 
 
 def slugify(text: str) -> str:
@@ -266,7 +266,7 @@ def convert(md_text: str, page_title: str, css_href: str | None, css_inline: str
     if css_inline:
         style_tag = f"<style>\n{css_inline}\n</style>"
     else:
-        href = css_href or "assets/freenove-tutorial.css"
+        href = css_href or "assets/chaoxi-tutorial.css"
         style_tag = f'<link rel="stylesheet" href="{html.escape(href)}" />'
 
     doc = f"""<!DOCTYPE html>
@@ -278,9 +278,9 @@ def convert(md_text: str, page_title: str, css_href: str | None, css_inline: str
 {style_tag}
 </head>
 <body>
-<div class="site-header"><a href="https://www.freenove.com">www.freenove.com</a></div>
+<div class="site-header"><a href="https://zhentao-lin.github.io/CX_Product_Tutorials/">ChaoXi</a></div>
 <article class="page">
-<p class="meta">Generated from Markdown · Freenove_Tutorial_Style_Guide §13</p>
+<p class="meta">Generated from Markdown · ChaoXi_Tutorial_Style_Guide §13</p>
 {"".join(final_body)}
 </article>
 </body>
@@ -290,7 +290,7 @@ def convert(md_text: str, page_title: str, css_href: str | None, css_inline: str
 
 
 def main(argv: list[str] | None = None) -> int:
-    ap = argparse.ArgumentParser(description="Freenove tutorial MD → HTML")
+    ap = argparse.ArgumentParser(description="ChaoXi tutorial MD → HTML")
     ap.add_argument("input", help="input .md path")
     ap.add_argument("-o", "--output", help="output .html path")
     ap.add_argument("--title", help="HTML <title>")
