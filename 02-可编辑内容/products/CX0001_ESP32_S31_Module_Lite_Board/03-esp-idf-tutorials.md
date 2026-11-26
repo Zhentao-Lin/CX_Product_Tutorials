@@ -21,14 +21,33 @@
 | 08 | Wi-Fi Socket | [08_WIFI_SOCKET.html](https://zhentao-lin.github.io/CX0001_ESP32_S31_Module_Lite_Board/08_WIFI_SOCKET.html) | [08_WIFI_SOCKET.md](https://github.com/Zhentao-Lin/CX0001_ESP32_S31_Module_Lite_Board/blob/main/04.%E6%95%99%E7%A8%8B/08_WIFI_SOCKET.md) | [08_WIFI_SOCKET](https://github.com/Zhentao-Lin/CX0001_ESP32_S31_Module_Lite_Board/tree/main/03.Sketch/08_WIFI_SOCKET) |
 | 09 | 网页控 WS2812 | [09_WEB_WS2812.html](https://zhentao-lin.github.io/CX0001_ESP32_S31_Module_Lite_Board/09_WEB_WS2812.html) | [09_WEB_WS2812.md](https://github.com/Zhentao-Lin/CX0001_ESP32_S31_Module_Lite_Board/blob/main/04.%E6%95%99%E7%A8%8B/09_WEB_WS2812.md) | [09_WEB_WS2812](https://github.com/Zhentao-Lin/CX0001_ESP32_S31_Module_Lite_Board/tree/main/03.Sketch/09_WEB_WS2812) |
 
-## 示例：编译第 1 章工程
+## 示例：配置、编译第 1 章工程
+
+各 Sketch 已带 `sdkconfig.defaults`（`esp32s31`、16MB Flash/PSRAM、自定义分区、USB-Serial-JTAG 控制台等）。**首次**打开工程或 `fullclean` 后需 `set-target`；要改引脚/间隔或 Wi-Fi 等再进 `menuconfig`。
+
+**VS Code（Espressif IDF 扩展）：** 打开工程文件夹 → 选 **Set Espressif device target** → `esp32s31` → **SDK Configuration editor (menuconfig)** → Build → Flash。
+
+**命令行：**
 
 ```powershell
 cd <硬件仓路径>\03.Sketch\01_GPIO_LED
+
+# 首次 / 换芯片 / 删过 build 后必做：写入目标并合并 sdkconfig.defaults
 idf.py --preview set-target esp32s31
+
+# 可选：图形配置（01 章在 Example Configuration 改 LED GPIO、闪烁间隔）
+idf.py --preview menuconfig
+
 idf.py --preview build
 idf.py --preview -p <COM口> flash monitor
 ```
+
+| 章节 | menuconfig 常用项 |
+|------|-------------------|
+| 01～07 | **Example Configuration**（若有）：引脚、间隔等 |
+| 08、09 | **Example Configuration**：`Wi-Fi SSID` / `Password`（或先改 `sdkconfig.defaults` 再 `set-target`） |
+
+若 `set-target` 后选项不对，可 `idf.py --preview fullclean` 后重做 `set-target` → `build`。
 
 ## 维护说明（给你自己）
 
