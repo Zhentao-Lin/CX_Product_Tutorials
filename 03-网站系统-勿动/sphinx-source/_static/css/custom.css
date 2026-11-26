@@ -101,20 +101,26 @@
   border-radius: 4px;
 }
 
-/* 产品大纲页：板照 / 引脚图别占满屏 */
+/* 产品大纲页：上下两图，板上实物视觉尺寸接近 */
+.rst-content .cx-product-figures {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  margin: 0.5em 0 1em;
+}
 .rst-content .cx-product-figures img {
   display: block;
-  width: auto;
   height: auto;
-  margin: 0.65em 0;
+  margin: 0;
   border: 1px solid #e8e8e8;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  border-radius: 4px;
 }
-.rst-content .cx-product-figures img:first-of-type {
-  max-width: min(100%, 360px);
-}
-.rst-content .cx-product-figures img:last-of-type {
-  max-width: min(100%, 480px);
+.rst-content .cx-product-figures img.cx-fig-board,
+.rst-content .cx-product-figures img.cx-fig-pinout {
+  width: 220px;
+  max-width: min(100%, 220px);
 }
 
 /* 上一页 / 下一页按钮 */
