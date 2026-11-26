@@ -61,15 +61,74 @@
 ![板子正面](assets/images/board-front.png)
 ```
 
-固件 / 示例**代码仓库**可另建 GitHub 仓，教程里超链接即可，不必整仓塞进本教程仓库。
+### 3. 私有仓外链（硬件 / 代码只有你能进）
 
-### 3. 其它常用目录（同一产品下）
+本教程仓是**公开**的；完整硬件工程、固件源码放在**私有** GitHub 仓库，章节里只写链接。  
+**你登录后能打开；路人点开没权限。**
+
+#### 3.1 怎么新建私有仓库（GitHub 网页）
+
+1. 打开 https://github.com/new（需已登录）。
+2. **Repository name**：起名，例如 `CX_ESP32_S31_Module_Hardware`、`CX_ESP32_S31_Module_Firmware`。
+3. 选 **Private**（私有），不要选 Public。
+4. 可选勾选 `Add a README`，点 **Create repository**。
+5. 创建后浏览器地址栏就是仓库地址，例如：  
+   `https://github.com/Zhentao-Lin/CX_ESP32_S31_Module_Hardware`  
+   **复制这个地址**备用。
+
+把原理图/PCB/源码用 Git 推到这个私有仓（或网页 Upload files），不要推到本公开教程仓。
+
+#### 3.2 怎么把链接加进本教程
+
+1. 打开对应产品章节，例如：  
+   `02-可编辑内容/products/CX_ESP32_S31_Module_Xiaozhi_Board/01-overview.md`  
+   （或用 `start-editor.bat` 打开同一章。）
+2. 在文中合适位置粘贴下面模板，**只改括号里的网址**：
+
+```markdown
+## 相关仓库（内部）
+
+| 内容 | 说明 |
+|------|------|
+| 硬件设计 | [私有 · PCB/原理图工程](https://github.com/Zhentao-Lin/你的私有硬件仓) |
+| 固件源码 | [私有 · 固件仓库](https://github.com/Zhentao-Lin/你的私有固件仓) |
+
+> 以上仓库为私有：仅维护者可见；公开读者无需访问也可按本教程操作。
+```
+
+单行也可以：
+
+```markdown
+内部硬件仓：https://github.com/Zhentao-Lin/你的私有硬件仓  
+内部固件仓：https://github.com/Zhentao-Lin/你的私有固件仓
+```
+
+3. **保存**文件（编辑器里点「保存」，或 Cursor 里 `Ctrl+S`）。
+4. **发布**：编辑器点「发布到网站」，或终端：
+
+```powershell
+cd E:\GitHub\CX_Product_Tutorials
+git add -A
+git commit -m "添加私有仓链接"
+git push origin main
+```
+
+约 1～2 分钟后，公开教程页上会出现链接；你点能进私有仓，别人不能。
+
+#### 3.3 注意
+
+1. 私有仓文件**不要**再复制进本公开仓 `assets/`（否则就公开了）。
+2. 公开 MD 里**不要**写 Token、密码、带密钥的下载地址。
+3. 链接 URL 别人能看见，只是进不去；保密靠私有仓权限。
+4. 若希望**读者也能下**某份资料：放本仓 `assets/hardware/`，或另建**公开**仓再链过来。
+
+### 4. 其它常用目录（同一产品下）
 
 | 路径 | 用途 |
 |------|------|
-| `assets/attachments/` | 固件包、其它 ZIP/PDF |
-| `assets/code/` | 本仓偶尔放的短示例文件 |
-| `assets/data/` | CSV 等数据（BOM 也可放这里） |
+| `assets/attachments/` | 固件包、其它 ZIP/PDF（放这里即公开） |
+| `assets/code/` | 本仓偶尔放的短示例文件（公开） |
+| `assets/data/` | CSV 等数据（公开） |
 
 更细的写法见：`01-使用说明/03-图片与附件.md`。
 
