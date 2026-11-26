@@ -1,4 +1,4 @@
-# 在 https://readthedocs.org 关联 GitHub 仓库后，每次 push 会自动构建（界面与 Freenove 同源：sphinx-rtd-theme）
+# Read the Docs（可选）。路径与 GitHub Pages 一致。
 version: "2"
 
 build:
@@ -7,11 +7,11 @@ build:
     python: "3.12"
   jobs:
     pre_build:
-      - python tools/cx_docs.py sync
+      - python "03-网站系统-勿动/tools/cx_docs.py" sync
 
 python:
   install:
-    - requirements: docs/requirements.txt
+    - requirements: 03-网站系统-勿动/sphinx-source/requirements.txt
 
 sphinx:
-  configuration: docs/source/conf.py
+  configuration: 03-网站系统-勿动/sphinx-source/conf.py

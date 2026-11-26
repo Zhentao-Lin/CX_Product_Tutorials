@@ -1,4 +1,7 @@
-docs/_build/
+03-网站系统-勿动/_build/
+03-网站系统-勿动/sphinx-source/products
+03-网站系统-勿动/sphinx-source/index.md
+02-可编辑内容/products/**/index.md
 __pycache__/
 .venv/
 venv/
@@ -7,3 +10,5 @@ venv/
 Thumbs.db
 _site/
 .bundle/
+*.freenove.html
+**/__pycache__/

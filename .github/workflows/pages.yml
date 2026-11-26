@@ -27,16 +27,18 @@ jobs:
         with:
           python-version: "3.12"
       - name: Install dependencies
-        run: pip install -r docs/requirements.txt
+        run: pip install -r "03-网站系统-勿动/sphinx-source/requirements.txt"
       - name: Sync toctree from catalog and Markdown
-        run: python tools/cx_docs.py sync
+        run: python "03-网站系统-勿动/tools/cx_docs.py" sync
       - name: Build HTML
         run: |
-          sphinx-build -b html docs/source docs/_build/html \
+          sphinx-build -b html \
+            "03-网站系统-勿动/sphinx-source" \
+            "03-网站系统-勿动/_build/html" \
             -D html_baseurl="${{ steps.pages.outputs.base_path }}"
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/_build/html
+          path: 03-网站系统-勿动/_build/html
 
   deploy:
     needs: build
