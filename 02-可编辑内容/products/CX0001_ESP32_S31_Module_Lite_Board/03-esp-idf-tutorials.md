@@ -4,7 +4,7 @@
 
 **统一入口：** [教程 HTML 目录](https://zhentao-lin.github.io/CX0001_ESP32_S31_Module_Lite_Board/index.html)
 
-环境要求：**ESP-IDF v6.1.1**、`esp32s31`、`idf.py --preview`。
+环境要求：**ESP-IDF v6.1.0**、`esp32s31`、`idf.py --preview`。
 
 ## 章节目录
 

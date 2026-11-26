@@ -35,7 +35,7 @@
 | USB Device（如 MSC） | USB-OTG（与烧录口不是同一 Type-C） |
 | Flash / PSRAM | 16 MB / 16 MB |
 
-目标芯片：`esp32s31`；`idf.py` 需带 **`--preview`**（ESP-IDF v6.1.1）。
+目标芯片：`esp32s31`；`idf.py` 需带 **`--preview`**（ESP-IDF v6.1.0）。
 
 ## 相关仓库
 
