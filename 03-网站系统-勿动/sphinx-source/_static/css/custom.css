@@ -109,15 +109,22 @@
   gap: 0.35rem;
   margin: 0.5em 0 1em;
 }
-.rst-content .cx-product-figures img {
+.rst-content .cx-product-figures .cx-fig-board img,
+.rst-content .cx-product-figures .cx-fig-pinout img {
   display: block;
-  width: 220px !important;
-  max-width: min(100%, 220px) !important;
   height: auto !important;
   margin: 0;
   border: 1px solid #e8e8e8;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   border-radius: 4px;
+}
+.rst-content .cx-product-figures .cx-fig-board img {
+  width: calc(220px / 3) !important;
+  max-width: min(100%, calc(220px / 3)) !important;
+}
+.rst-content .cx-product-figures .cx-fig-pinout img {
+  width: 220px !important;
+  max-width: min(100%, 220px) !important;
 }
 
 /* 上一页 / 下一页按钮 */
