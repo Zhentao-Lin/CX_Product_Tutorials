@@ -111,16 +111,13 @@
 }
 .rst-content .cx-product-figures img {
   display: block;
-  height: auto;
+  width: 220px !important;
+  max-width: min(100%, 220px) !important;
+  height: auto !important;
   margin: 0;
   border: 1px solid #e8e8e8;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
   border-radius: 4px;
-}
-.rst-content .cx-product-figures img.cx-fig-board,
-.rst-content .cx-product-figures img.cx-fig-pinout {
-  width: 220px;
-  max-width: min(100%, 220px);
 }
 
 /* 上一页 / 下一页按钮 */
