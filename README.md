@@ -22,7 +22,7 @@
 ## 写电路板教程时，文件放哪
 
 所有内容都在：`02-可编辑内容/products/<产品ID>/`  
-（现有产品例如 `CX_ESP32_S31_Module_Xiaozhi_Board`。新产品先改 `02-可编辑内容/catalog/products.yml`，再建同名文件夹。）
+（现有产品例如 `CX0001_ESP32_S31_Module_Lite_Board`。新产品先改 `02-可编辑内容/catalog/products.yml`，再建同名文件夹。）
 
 ### 1. 开源硬件资料（原理图 / PCB / 3D / BOM）
 
@@ -81,7 +81,7 @@
 #### 3.2 怎么把链接加进本教程
 
 1. 打开对应产品章节，例如：  
-   `02-可编辑内容/products/CX_ESP32_S31_Module_Xiaozhi_Board/01-overview.md`  
+   `02-可编辑内容/products/CX0001_ESP32_S31_Module_Lite_Board/01-overview.md`  
    （或用 `start-editor.bat` 打开同一章。）
 2. 在文中合适位置粘贴下面模板，**只改括号里的网址**：
 

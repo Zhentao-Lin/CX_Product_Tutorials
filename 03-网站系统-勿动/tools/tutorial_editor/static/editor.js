@@ -212,7 +212,7 @@ document.getElementById("productSelect").onchange = async (e) => {
 };
 
 document.getElementById("btnNewProduct").onclick = async () => {
-  const id = prompt("新产品 ID（如 CX_ESP32_S31_Module_Xiaozhi_Board）：");
+  const id = prompt("新产品 ID（如 CX0001_ESP32_S31_Module_Lite_Board）：");
   if (!id) return;
   const title = prompt("产品显示名称：");
   if (!title) return;

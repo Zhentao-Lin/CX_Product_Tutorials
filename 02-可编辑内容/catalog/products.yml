@@ -1,13 +1,8 @@
 # 产品清单（章节不用写在这里：各产品目录下的 *.md 会自动进入目录）
 products:
-  - id: CX_ESP32_S31_Module_Xiaozhi_Board
-    title: ESP32-S3 小智板（模组方案）
+  - id: CX0001_ESP32_S31_Module_Lite_Board
+    title: CX0001 ESP32-S31 Module Lite（精简开发板）
     status: 连载中
     summary: |
-      模组方案，上手快。适合小智语音交互与物联网原型。
-
-  - id: CX_ESP32_S31_Chip_Xiaozhi_Board
-    title: ESP32-S3 小智板（芯片方案）
-    status: 策划中
-    summary: |
-      芯片裸板方案，便于控成本与自定义外围。
+      ESP32-S31 精简板：Wi-Fi 6 + BLE 5.4 + USB-OTG / Serial-JTAG。
+      ESP-IDF v6.1.1 示例 01～09 章教程维护在独立硬件仓，本站章节为**导读 + 外链索引**（正文以硬件仓为准）。
