@@ -190,11 +190,21 @@ def write_root_index(products: list[dict]) -> None:
         "",
         home,
         "",
-        "```{toctree}",
-        ":maxdepth: 1",
-        ":caption: 产品列表",
+        "## 产品列表",
         "",
     ]
+    for p in products:
+        title = (p.get("title") or p["id"]).strip()
+        lines.append(f"- [{title}](products/{p['id']}/index)")
+    lines.extend(
+        [
+            "",
+            "```{toctree}",
+            ":hidden:",
+            ":maxdepth: 2",
+            "",
+        ]
+    )
     for p in products:
         lines.append(f"products/{p['id']}/index")
     lines.extend(["```", ""])
