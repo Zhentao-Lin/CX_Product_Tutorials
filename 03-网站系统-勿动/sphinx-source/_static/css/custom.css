@@ -1,112 +1,128 @@
-/* CX + ChaoXi 轻量品牌：主色 #E3760C，布局仍用 sphinx-rtd-theme */
-
-:root {
-  --cx-orange: #e3760c;
-  --cx-orange-deep: #c6650a;
-  --cx-orange-soft: #ed7d31;
-  --cx-orange-row: #fbe4d5;
-  --cx-orange-border: #f4b083;
-  --cx-ink: #2c2c2c;
-}
-
-/* 侧栏搜索区 / 顶栏感 */
-.wy-side-nav-search {
-  background-color: var(--cx-orange) !important;
-}
-.wy-side-nav-search > a,
-.wy-side-nav-search .wy-dropdown > a {
-  color: #fff !important;
-  font-weight: 700;
-}
-.wy-side-nav-search input[type="text"] {
-  border-radius: 4px;
-  border: none;
-}
-
-.wy-nav-top {
-  background: var(--cx-orange) !important;
-}
-
-/* 侧栏当前项 */
-.wy-menu-vertical li.current > a,
-.wy-menu-vertical li.toctree-l1.current > a {
-  border-left: 3px solid var(--cx-orange);
-}
-
-.wy-menu-vertical a:hover {
-  background-color: #f7f7f7;
-}
-
-/* 正文 */
-.rst-content {
-  color: var(--cx-ink);
-  line-height: 1.7;
-}
-.rst-content h1,
-.rst-content h2,
-.rst-content h3 {
-  font-weight: 700;
-}
-.rst-content h2 {
-  border-bottom: 2px solid var(--cx-orange);
-  padding-bottom: 0.25em;
-}
-.rst-content a {
-  color: #0563c1;
-}
-.rst-content a:visited {
-  color: #954f72;
-}
-
-/* 表格：橙表头 */
-.rst-content table.docutils thead th,
-.rst-content table.wiki thead th {
-  background: var(--cx-orange-soft) !important;
-  color: #fff !important;
-  border-color: var(--cx-orange-border) !important;
-}
-.rst-content table.docutils td,
-.rst-content table.docutils th,
-.rst-content table.wiki td,
-.rst-content table.wiki th {
-  border-color: var(--cx-orange-border) !important;
-}
-.rst-content table.docutils tr:nth-child(even) td {
-  background: var(--cx-orange-row);
-}
-
-/* 提示 / 配图引用块 */
-.rst-content blockquote {
-  border-left: 4px solid var(--cx-orange);
-  background: #fff8f0;
-  padding: 0.6em 1em;
-  margin: 1em 0;
-  color: #5a4030;
-}
-
-/* 代码 */
-.rst-content div[class^="highlight"] {
-  border-radius: 4px;
-  border: 1px solid #e8e8e8;
-}
-.rst-content pre {
-  font-size: 13px;
-  line-height: 1.45;
-}
-
-/* 图片不撑破版心 */
-.rst-content img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 4px;
-}
-
-/* 上一页 / 下一页按钮 */
-.rst-content .btn-neutral {
-  background-color: var(--cx-orange) !important;
-  color: #fff !important;
-}
-.rst-content .btn-neutral:hover {
-  background-color: var(--cx-orange-deep) !important;
-  color: #fff !important;
-}
+/* CX + ChaoXi 轻量品牌：主色 #E3760C，布局仍用 sphinx-rtd-theme */
+
+:root {
+  --cx-orange: #e3760c;
+  --cx-orange-deep: #c6650a;
+  --cx-orange-soft: #ed7d31;
+  --cx-orange-row: #fbe4d5;
+  --cx-orange-border: #f4b083;
+  --cx-ink: #2c2c2c;
+}
+
+/* 侧栏搜索区 / 顶栏感 */
+.wy-side-nav-search {
+  background-color: var(--cx-orange) !important;
+}
+.wy-side-nav-search > a,
+.wy-side-nav-search .wy-dropdown > a {
+  color: #fff !important;
+  font-weight: 700;
+}
+.wy-side-nav-search input[type="text"] {
+  border-radius: 4px;
+  border: none;
+}
+
+.wy-nav-top {
+  background: var(--cx-orange) !important;
+}
+
+/* 侧栏当前项 */
+.wy-menu-vertical li.current > a,
+.wy-menu-vertical li.toctree-l1.current > a {
+  border-left: 3px solid var(--cx-orange);
+}
+
+.wy-menu-vertical a:hover {
+  background-color: #f7f7f7;
+}
+
+/* 正文 */
+.rst-content {
+  color: var(--cx-ink);
+  line-height: 1.7;
+}
+.rst-content h1,
+.rst-content h2,
+.rst-content h3 {
+  font-weight: 700;
+}
+.rst-content h2 {
+  border-bottom: 2px solid var(--cx-orange);
+  padding-bottom: 0.25em;
+}
+.rst-content a {
+  color: #0563c1;
+}
+.rst-content a:visited {
+  color: #954f72;
+}
+
+/* 表格：橙表头 */
+.rst-content table.docutils thead th,
+.rst-content table.wiki thead th {
+  background: var(--cx-orange-soft) !important;
+  color: #fff !important;
+  border-color: var(--cx-orange-border) !important;
+}
+.rst-content table.docutils td,
+.rst-content table.docutils th,
+.rst-content table.wiki td,
+.rst-content table.wiki th {
+  border-color: var(--cx-orange-border) !important;
+}
+.rst-content table.docutils tr:nth-child(even) td {
+  background: var(--cx-orange-row);
+}
+
+/* 提示 / 配图引用块 */
+.rst-content blockquote {
+  border-left: 4px solid var(--cx-orange);
+  background: #fff8f0;
+  padding: 0.6em 1em;
+  margin: 1em 0;
+  color: #5a4030;
+}
+
+/* 代码 */
+.rst-content div[class^="highlight"] {
+  border-radius: 4px;
+  border: 1px solid #e8e8e8;
+}
+.rst-content pre {
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* 图片不撑破版心 */
+.rst-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+/* 产品大纲页：板照 / 引脚图别占满屏 */
+.rst-content .cx-product-figures img {
+  display: block;
+  width: auto;
+  height: auto;
+  margin: 0.65em 0;
+  border: 1px solid #e8e8e8;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+}
+.rst-content .cx-product-figures img:first-of-type {
+  max-width: min(100%, 360px);
+}
+.rst-content .cx-product-figures img:last-of-type {
+  max-width: min(100%, 480px);
+}
+
+/* 上一页 / 下一页按钮 */
+.rst-content .btn-neutral {
+  background-color: var(--cx-orange) !important;
+  color: #fff !important;
+}
+.rst-content .btn-neutral:hover {
+  background-color: var(--cx-orange-deep) !important;
+  color: #fff !important;
+}
