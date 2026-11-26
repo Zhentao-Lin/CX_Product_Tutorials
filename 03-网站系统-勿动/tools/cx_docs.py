@@ -191,7 +191,7 @@ def write_root_index(products: list[dict]) -> None:
         home,
         "",
         "```{toctree}",
-        ":maxdepth: 2",
+        ":maxdepth: 1",
         ":caption: 产品列表",
         "",
     ]
